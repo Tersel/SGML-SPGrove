@@ -2,18 +2,21 @@
 # Copyright (C) 1997 Ken MacLeod
 # See the file COPYING for distribution terms.
 #
-# $Id: Element.pm,v 1.7 1997/10/19 21:56:03 ken Exp $
+# $Id: Element.pm,v 1.9 1997/12/01 03:18:47 ken Exp $
 #
 
-# Internally, an SGML::Element is an array containing
-#
-#    [0] -- contents
-#    [1] -- gi (name)
-#    [2] -- attributes
 
 package SGML::Element;
 
 use strict;
+use Class::Visitor;
+
+visitor_class 'SGML::Element', 'Class::Visitor::Base',
+    [
+     'contents' => '@',		# [0]
+     'gi' => '$',		# [1]
+     'attributes' => '@',	# [2]
+    ];
 
 =head1 NAME
 
@@ -25,10 +28,12 @@ SGML::Element - an element of an SGML, XML, or HTML document
   $element->name;
   $element->attr ($attr[, $value]);
   $element->attr_as_string ($attr[, $context, ...]);
-  $element->attributes;
-  $element->contents;
+  $element->attributes [($attributes)];
+  $element->contents [($contents)];
 
   $element->as_string([$context, ...]);
+
+  $element->iter;
 
   $element->accept($visitor, ...);
   $element->accept_gi($visitor, ...);
@@ -45,30 +50,42 @@ element.
 C<$element-E<gt>gi> and C<$element-E<gt>name> are synonyms, they
 return the generic identifier of the element.
 
-C<$element-E<gt>attr> returns the array value of an attribute, if a
-second argument is given then that value is assigned to the attribute
-and returned.  When assigning a value, C<attr> can take an array, or
-an object or scalar.  If given an object or scalar, C<attr> will
-create an array value for it.
+C<$element-E<gt>attr> returns the value of an attribute, if a second
+argument is given then that value is assigned to the attribute and
+returned.  The value of an attribute may be an array of scalar or
+C<SGML::SData> objects, an C<SGML::Notation>, or an array of
+C<SGML::Entity> or C<SGML::ExtEntity> objects.  C<attr> returns
+C<undef> for implied attributes.
 
 C<$element-E<gt>attr_as_string> returns the value of an attribute as a
-string, possibly modified by C<$context>.
+string, possibly modified by C<$context>. (XXX undefined results if
+the attribute is not cdata/sdata.)
 
 C<$element-E<gt>attributes> returns a reference to a hash containing
-the attributes of the element.  The keys of the hash are the attribute
-names and the values are references to an array containing scalars or
-C<SGML::SData> objects.
+the attributes of the element, or undef if there are no attributes
+defined for for this element.  The keys of the hash are the attribute
+names and the values are as defined above.
+C<$element-E<gt>attributes($attributes)> assigns the attributes from
+the hash C<$attributes>.  No hash entries are made for implied
+attributes.
 
 C<$element-E<gt>contents> returns a reference to an array containing
 the children of the element.  The contents of the element may contain
-other elements, scalars, or C<SGML::SData> or C<SGML:PI> objects.
+other elements, scalars, C<SGML::SData>, C<SGML::PI>, C<SGML::Entity>,
+C<SGML::ExtEntity>, or C<SGML::SubDocEntity> objects.
+C<$element-E<gt>contents($contents)> assigns the contents from the
+array C<$contents>.
 
 C<$element-E<gt>as_string> returns the entire hierarchy of this
 element as a string, possibly modified by C<$context>.  See
-L<SGML::SData> and L<SGML::PI> for more detail.
+L<SGML::SData> and L<SGML::PI> for more detail.  (XXX does not expand
+entities.)
+
+C<$element->iter> returns an iterator for the element, see
+C<Class::Visitor> for details.
 
 C<$element-E<gt>accept($visitor[, ...])> issues a call back to
-S<C<$visitor-E<gt>visit_element($element[, ...])>>.  See examples
+S<C<$visitor-E<gt>visit_SGML_Element($element[, ...])>>.  See examples
 C<visitor.pl> and C<simple-dump.pl> for more information.
 
 C<$element-E<gt>accept_gi($visitor[, ...])> issues a call back to
@@ -98,20 +115,12 @@ Ken MacLeod, ken@bitsko.slc.ut.us
 =head1 SEE ALSO
 
 perl(1), SGML::SPGrove(3), Text::EntityMap(3), SGML::SData(3),
-SGML::PI(3).
+SGML::PI(3), Class::Visitor(3).
 
 =cut
 
-sub contents {
-    return $_[0]->[0];
-}
-
-sub gi {
-    return $_[0]->[1];
-}
-
 sub name {
-    return $_[0]->[1];
+    gi(@_);
 }
 
 sub attr {
@@ -126,7 +135,11 @@ sub attr {
 	    return $self->[2]->{$attr} = [$value];
 	}	    
     } else {
-	return $self->[2]->{$attr};
+	if (!defined $self->[2]) {
+	    return undef;
+	} else {
+	    return $self->[2]->{$attr};
+	}
     }
 }
 
@@ -135,86 +148,72 @@ sub attr_as_string {
     my $self = shift;
     my $attr = shift;
 
-    my $value = $self->[2]->{$attr};
-    return "" if !defined $value;
+    my $attributes = $self->[2];
+    return "" if (!defined $attributes);
+
+    my $value = $attributes->{$attr};
+    return "" if (!defined($value));
+    return $value if (!ref ($value)); # return tokens
 
     my ($ii, @string);
     for ($ii = 0; $ii <= $#{$value}; $ii ++) {
-	my ($child) = $value->[$ii];
+	my $child = $value->[$ii];
 	if (!ref ($child)) {
-	    # XXX should use context for a CDATA mapper
-	    push (@string, $child);
+	    my $context = shift;
+	    if (defined ($context->{'cdata_mapper'})) {
+		push (@string, &{$context->{'cdata_mapper'}}($child, @_));
+	    } else {
+		push (@string, $child);
+	    }
 	} else {
 	    push (@string, $child->as_string(@_));
 	}
     }
     return (join ("", @string));
-}
-
-sub attributes {
-    return $_[0]->[2];
 }
 
 # $element->as_string($context);
 sub as_string {
-    my ($self) = shift;
+    my $self = shift;
+    my $context = shift;
 
-    my (@string);
-    my ($ii);
+    my @string;
+    my $ii;
     for ($ii = 0; $ii <= $#{$self->[0]}; $ii ++) {
-	my ($child) = $self->[0][$ii];
+	my $child = $self->[0][$ii];
 	if (!ref ($child)) {
-	    # XXX should use context for a CDATA mapper
-	    push (@string, $child);
+	    if (defined ($context->{'cdata_mapper'})) {
+		push (@string, &{$context->{'cdata_mapper'}}($child, @_));
+	    } else {
+		push (@string, $child);
+	    }
 	} else {
-	    push (@string, $child->as_string(@_));
+	    push (@string, $child->as_string($context, @_));
 	}
     }
     return (join ("", @string));
 }
 
-sub accept {
-    my ($self) = shift;
-    my ($visitor) = shift;
-
-    $visitor->visit_element ($self, @_);
-}
-
 sub accept_gi {
-    my ($self) = shift;
-    my ($visitor) = shift;
+    my $self = shift;
+    my $visitor = shift;
 
-    my ($gi) = $self->gi;
+    my $gi = $self->gi;
 
     # convert all non-word characters to `_' (matched in
     # SpecBuilder.pm)
     $gi =~ s/\W/_/g;
-    my ($alias) = "visit_gi_" . $gi;
+    my $alias = "visit_gi_" . $gi;
     $visitor->$alias ($self, @_);
 }
 
-sub children_accept {
-    my ($self) = shift;
-    my ($visitor) = shift;
-
-    my ($ii);
-    for ($ii = 0; $ii <= $#{$self->[0]}; $ii ++) {
-	my ($child) = $self->[0][$ii];
-	if (!ref ($child)) {
-	    $visitor->visit_scalar ($child, @_);
-	} else {
-	    $child->accept ($visitor, @_);
-	}
-    }
-}
-
 sub children_accept_gi {
-    my ($self) = shift;
-    my ($visitor) = shift;
+    my $self = shift;
+    my $visitor = shift;
 
-    my ($ii);
+    my $ii;
     for ($ii = 0; $ii <= $#{$self->[0]}; $ii ++) {
-	my ($child) = $self->[0][$ii];
+	my $child = $self->[0][$ii];
 	if (!ref ($child)) {
 	    $visitor->visit_scalar ($child, @_);
 	} else {

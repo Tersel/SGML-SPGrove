@@ -2,14 +2,14 @@
 # Copyright (C) 1997 Ken MacLeod
 # See the file COPYING for distribution terms.
 #
-# $Id: my-html.pl,v 1.1 1997/10/11 00:02:00 ken Exp $
+# $Id: my-html.pl,v 1.2 1997/11/03 17:32:11 ken Exp $
 #
 
-#
 # `my-html.pl' uses `accept_gi' methods to generate calls back using
-# an element's GI instead of the generic `visit_element'.  Because we
-# don't want to handle every single possible GI, Perl's AUTOLOAD
-# feature is used to pass through any elements we don't handle.
+# an element's GI instead of the generic `visit_SGML_Element'.
+# Because we don't want to handle every single possible GI, Perl's
+# AUTOLOAD feature is used to pass through any elements we don't
+# handle.
 #
 # `SpecBuilder.pm' is another example of using `visit_gi_NAME'
 # callbacks.
@@ -46,33 +46,33 @@ use strict;
 use vars qw{$AUTOLOAD};
 
 sub new {
-    my ($type) = shift;
+    my $type = shift;
 
     return (bless {}, $type);
 }
 
-sub visit_grove {
-    my ($self) = shift;
-    my ($grove) = shift;
+sub visit_SGML_SPGrove {
+    my $self = shift;
+    my $grove = shift;
 
     $grove->children_accept_gi ($self, @_);
 }
 
-sub visit_element {
-    die "$::prog: visit_element called while using accept_gi??\n";
+sub visit_SGML_Element {
+    die "$::prog: visit_SGML_Element called while using accept_gi??\n";
 }
 
-sub visit_sdata {
-    my ($self) = shift;
-    my ($sdata) = shift;
+sub visit_SGML_SData {
+    my $self = shift;
+    my $sdata = shift;
 
     warn "is SData?\n";
     print "&" . $sdata->name . ";";
 }
 
 sub visit_scalar {
-    my ($self) = shift;
-    my ($scalar) = shift;
+    my $self = shift;
+    my $scalar = shift;
 
     $scalar =~ tr/\r/\n/;
     print $scalar;
@@ -93,11 +93,11 @@ sub visit_gi_DATE {
 }
 
 sub visit_gi_PERL {
-    my ($self) = shift;
-    my ($element) = shift;
+    my $self = shift;
+    my $element = shift;
 
     # doesn't grok entities/SData, be sure to use CDATA marked sections
-    my ($perl) = $element->as_string;
+    my $perl = $element->as_string;
     no strict;
     eval $perl;
     use strict;

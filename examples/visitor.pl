@@ -2,7 +2,7 @@
 # Copyright (C) 1997 Ken MacLeod
 # See the file COPYING for distribution terms.
 #
-# $Id: visitor.pl,v 1.1 1997/10/07 00:51:03 ken Exp $
+# $Id: visitor.pl,v 1.2 1997/11/03 17:32:11 ken Exp $
 #
 
 #
@@ -28,8 +28,9 @@
 
 use SGML::SPGrove;
 
+my $doc;
 foreach $doc (@ARGV) {
-    $grove = SGML::SPGrove->new ($doc);
+    my $grove = SGML::SPGrove->new ($doc);
 
     $grove->accept (Visitor->new);
 }
@@ -47,37 +48,65 @@ package Visitor;
 use strict;
 
 sub new {
-    my ($type) = shift;
+    my $type = shift;
 
     return (bless {}, $type);
 }
 
-sub visit_grove {
-    my ($self) = shift;
-    my ($grove) = shift;
+sub visit_SGML_SPGrove {
+    my $self = shift;
+    my $grove = shift;
 
 #    print "visiting grove $grove\n";
-    $grove->root->accept ($self, @_);
+    $grove->children_accept ($self, @_);
 }
 
-sub visit_element {
-    my ($self) = shift;
-    my ($element) = shift;
+sub visit_SGML_Element {
+    my $self = shift;
+    my $element = shift;
 
 #    print "visiting element $element, " . $element->name . "\n";
     $element->children_accept ($self, @_);
 }
 
-sub visit_sdata {
-    my ($self) = shift;
-    my ($sdata) = shift;
+sub visit_SGML_SData {
+    my $self = shift;
+    my $sdata = shift;
 
 #    print "visiting sdata $sdata, " . $sdata->data . "\n";
 }
 
+sub visit_SGML_PI {
+    my $self = shift;
+    my $pi = shift;
+
+#    print "visiting pi $pi, " . $pi->data . "\n";
+}
+
+sub visit_SGML_Entity {
+    my $self = shift;
+    my $entity = shift;
+
+#    print "visiting entity $entity, " . $entity->name . "\n";
+}
+
+sub visit_SGML_ExtEntity {
+    my $self = shift;
+    my $ext_entity = shift;
+
+#    print "visiting ext_entity $ext_entity, " . $ext_entity->name . "\n";
+}
+
+sub visit_SGML_SubDocEntity {
+    my $self = shift;
+    my $subdoc_entity = shift;
+
+#    print "visiting subdoc_entity $subdoc_entity, " . $subdoc_entity->name . "\n";
+}
+
 sub visit_scalar {
-    my ($self) = shift;
-    my ($scalar) = shift;
+    my $self = shift;
+    my $scalar = shift;
 
 #    print "visiting scalar $scalar\n";
 }

@@ -2,7 +2,7 @@
 # Copyright (C) 1997 Ken MacLeod
 # See the file COPYING for distribution terms.
 #
-# $Id: simple-dump.pl,v 1.1 1997/10/07 00:51:03 ken Exp $
+# $Id: simple-dump.pl,v 1.2 1997/11/03 17:32:11 ken Exp $
 #
 
 #
@@ -17,8 +17,9 @@
 
 use SGML::SPGrove;
 
+my $doc;
 foreach $doc (@ARGV) {
-    $grove = SGML::SPGrove->new ($doc);
+    my $grove = SGML::SPGrove->new ($doc);
 
     # note the extra argument `0', for no depth yet
     $grove->accept (SimpleDump->new, 0);
@@ -34,35 +35,67 @@ package SimpleDump;
 use strict;
 
 sub new {
-    my ($type) = shift;
+    my $type = shift;
 
     return (bless {}, $type);
 }
 
-sub visit_grove {
-    my ($self) = shift;
-    my ($grove) = shift;
-    my ($depth) = shift;
+sub visit_SGML_SPGrove {
+    my $self = shift;
+    my $grove = shift;
+    my $depth = shift;
 
     print ("  " x $depth . "grove $grove\n");
-    $grove->root->accept ($self, $depth + 1, @_);
+    $grove->children_accept ($self, $depth + 1, @_);
 }
 
-sub visit_element {
-    my ($self) = shift;
-    my ($element) = shift;
-    my ($depth) = shift;
+sub visit_SGML_Element {
+    my $self = shift;
+    my $element = shift;
+    my $depth = shift;
 
     print ("  " x $depth . $element->gi . "\n");
     $element->children_accept ($self, $depth + 1, @_);
 }
 
-sub visit_sdata {
-    my ($self) = shift;
-    my ($sdata) = shift;
-    my ($depth) = shift;
+sub visit_SGML_SData {
+    my $self = shift;
+    my $sdata = shift;
+    my $depth = shift;
 
     print ("  " x $depth . "&" . $sdata->data . "\n");
+}
+
+sub visit_SGML_PI {
+    my $self = shift;
+    my $pi = shift;
+    my $depth = shift;
+
+    print ("  " x $depth . "?" . $pi->data . "\n");
+}
+
+sub visit_SGML_Entity {
+    my $self = shift;
+    my $entity = shift;
+    my $depth = shift;
+
+    print ("  " x $depth . "<<" . $entity->name . "\n");
+}
+
+sub visit_SGML_ExtEntity {
+    my $self = shift;
+    my $ext_entity = shift;
+    my $depth = shift;
+
+    print ("  " x $depth . "<" . $ext_entity->name . "\n");
+}
+
+sub visit_SGML_SubDocEntity {
+    my $self = shift;
+    my $subdoc_entity = shift;
+    my $depth = shift;
+
+    print ("  " x $depth . "S<" . $subdoc_entity->name . "\n");
 }
 
 sub visit_scalar {
@@ -70,5 +103,6 @@ sub visit_scalar {
     my ($scalar) = shift;
     my ($depth) = shift;
 
+    $scalar =~ s/([\000-\037])/"\\" . sprintf ("%o", ord($1))/ge;
     print ("  " x $depth . '"' . $scalar . "\"\n");
 }

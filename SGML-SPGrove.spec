@@ -10,30 +10,7 @@ Packager: ken@bitsko.slc.ut.us (Ken MacLeod)
 BuildRoot: /tmp/SGML-SPGrove
 
 #
-# $Id: SGML-SPGrove.spec,v 1.4 1997/10/22 22:16:45 ken Exp $
-#
-# $Log: SGML-SPGrove.spec,v $
-# Revision 1.4  1997/10/22 22:16:45  ken
-#         - fixes
-#           - BuilderBuilder: wasn't passing extra arguments
-#           - BuilderBuilder: only carp once about unhandled GIs
-#           - RPM spec missing Simple/
-#
-# Revision 1.3  1997/10/05 21:46:43  ken
-# SGML-SPGrove.spec: fixed perl paths again
-#
-# Revision 1.2  1997/10/05 21:41:04  ken
-# SGML-SPGrove.spec: fixed perl path in %files
-#
-# Revision 1.1  1997/10/05 21:11:17  ken
-# MANIFEST: added COPYING, SGML-SPGrove.spec, ChangeLog
-#
-# README: updated to 0.02
-#
-# SGML-SPGrove, ChangeLog: added
-#
-# SPGrove.pm: dummied to 0.00 for `make-rel'
-#
+# $Id: SGML-SPGrove.spec,v 1.6 1997/11/06 19:21:54 ken Exp $
 #
 
 %description
@@ -55,7 +32,7 @@ make PREFIX="${RPM_ROOT_DIR}/usr" pure_install
 
 %files
 
-%doc README COPYING Changes test.pl
+%doc README COPYING Changes DOM test.pl
 
 %dir /usr/lib/perl5/i386-linux/5.003/auto/SGML/SPGrove
 /usr/lib/perl5/i386-linux/5.003/auto/SGML/SPGrove/SPGrove.so
@@ -64,6 +41,11 @@ make PREFIX="${RPM_ROOT_DIR}/usr" pure_install
 /usr/lib/perl5/SGML/SPGrove.pm
 /usr/lib/perl5/SGML/PI.pm
 /usr/lib/perl5/SGML/Element.pm
+/usr/lib/perl5/SGML/Entity.pm
+/usr/lib/perl5/SGML/ExtEntity.pm
+/usr/lib/perl5/SGML/Notation.pm
+/usr/lib/perl5/SGML/SubDocEntity.pm
+/usr/lib/perl5/SGML/Writer.pm
 /usr/lib/perl5/SGML/Simple/BuilderBuilder.pm
 /usr/lib/perl5/SGML/Simple/SpecBuilder.pm
 /usr/lib/perl5/SGML/Simple/Spec.pm

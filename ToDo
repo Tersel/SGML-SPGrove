@@ -4,15 +4,16 @@
 Otherwise,
 
  * bugs
-  ** SPGroveNew: dies ungracefully upon encountering a >255 Unicode character
-  ** SPGroveNew: doesn't disable printing of error messages
+  ** Simple: not recording errors
+  ** doesn't handle non-SGML chars
+  ** RPM spec doesn't work with Perl 5.004 MakeMaker
 
  * functionality
-  ** SPGroveNew: complete ESIS
-  ** Simple::Spec: better support for scalar, array, and hash elements
-  ** exception handling
   ** record ends are carriage returns
-  ** SPGrove: use Class::Visitor
+  ** SimpleSpec: cascading specs
+  ** create test suite
+  ** do more useful things with Entitys
+  ** Writer needs more intelligence
 
  * SP
   ** no events for undefined entities in XML
@@ -20,4 +21,8 @@ Otherwise,
 
  * projects
   ** Unicode
-  ** support Document Object Model <http://www.w3.org/DOM/>
+  ** create Document Object Model <http://www.w3.org/DOM/> layer
+  ** more examples
+
+ * issues
+  ** should SData be CharEntity or not even a special case of Entity?

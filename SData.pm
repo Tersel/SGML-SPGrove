@@ -2,17 +2,19 @@
 # Copyright (C) 1997 Ken MacLeod
 # See the file COPYING for distribution terms.
 #
-# $Id: SData.pm,v 1.5 1997/10/12 21:26:57 ken Exp $
+# $Id: SData.pm,v 1.6 1997/11/03 17:32:02 ken Exp $
 #
-
-# Internally, an SGML::SData is an array containing
-#
-#     [0] -- text
-#     [1] -- name
 
 package SGML::SData;
 
 use strict;
+use Class::Visitor;
+
+visitor_class 'SGML::SData', 'Class::Visitor::Base',
+    [
+     'data' => '@',		# [0]
+     'name' => '$',		# [1]
+];
 
 =head1 NAME
 
@@ -26,6 +28,8 @@ SGML::SData - an SGML, XML, or HTML document SData replacement
   $name = $sdata->name;
 
   $sdata->as_string([$context, ...]);
+
+  $sdata->iter;
 
   $sdata->accept($visitor, ...);
   $sdata->accept_gi($visitor, ...);
@@ -53,8 +57,11 @@ The actual implementation is:
 
     &{$context->{sdata_mapper}} ($self->data, @_);
 
+C<$sdata->iter> returns an iterator for the sdata object, see
+C<Class::Visitor> for details.
+
 C<$sdata-E<gt>accept($visitor[, ...])> issues a call back to
-S<C<$visitor-E<gt>visit_sdata($sdata[, ...])>>.  See examples
+S<C<$visitor-E<gt>visit_SGML_SData($sdata[, ...])>>.  See examples
 C<visitor.pl> and C<simple-dump.pl> for more information.
 
 C<$sdata-E<gt>accept_gi($visitor[, ...])> is implemented as a synonym
@@ -69,55 +76,39 @@ Ken MacLeod, ken@bitsko.slc.ut.us
 =head1 SEE ALSO
 
 perl(1), SGML::SPGrove(3), Text::EntityMap(3), SGML::Element(3),
-SGML::PI(3).
+SGML::PI(3), Class::Visitor(3).
 
 =cut
 
-sub new {
-    my $type = shift;
-    my $replacement = shift;
-    my $entity_name = shift;
-
-    my $self = [$replacement, $entity_name];
-
-    bless $self, $type;
-
-    return $self;
-}
-
-sub data {
-    return $_[0]->[0];
-}
-
-sub name {
-    return $_[0]->[1];
-}
-
 sub as_string {
-    my ($self) = shift;
-    my ($context) = shift;
+    my $self = shift;
+    my $context = shift;
 
-    # XXX needs to use `context' to find an SDATA mapper
-    return ("[" . $self->data . "]");
+    if (defined ($context->{'sdata_mapper'})) {
+	return &{$context->{'sdata_mapper'}} ($self->data, @_);
+    } else {
+	return ("[" . $self->data . "]");
+    }
 }
 
 sub accept {
-    my ($self) = shift;
-    my ($visitor) = shift;
+    my $self = shift;
+    my $visitor = shift;
 
-    $visitor->visit_sdata ($self, @_);
+    $visitor->visit_SGML_SData ($self, @_);
 }
 
 # synonomous to `accept'
 sub accept_gi {
-    my ($self) = shift;
-    my ($visitor) = shift;
+    my $self = shift;
+    my $visitor = shift;
 
-    $visitor->visit_sdata ($self, @_);
+    $visitor->visit_SGML_SData ($self, @_);
 }
 
 # these are here just for type compatibility
 sub children_accept { }
 sub children_accept_gi { }
+sub contents { return [] }
 
 1;

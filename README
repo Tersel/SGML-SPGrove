@@ -1,4 +1,4 @@
-$Id: README,v 1.7 1997/10/19 21:56:04 ken Exp $
+$Id: README,v 1.10 1997/11/06 19:21:54 ken Exp $
 
 
                             SGML::SPGrove
@@ -20,10 +20,14 @@ INTRODUCTION
     Perl objects.
 
     See the file Changes for user-visible changes.  See the `examples'
-    directory for examples of using `SPGrove'.
+    directory for examples of using `SPGrove'.  `DOM' relates SPGrove
+    to the World Wide Web Consortium's Document Object Model.
 
     Newer versions of this module can be found at
-    <ftp://ftp.uu.net/vendor/bitsko/gdo/>.
+    <ftp://ftp.uu.net/vendor/bitsko/gdo/>.  SPGrove shares a mailing
+    list with Quilt.  To subscribe to the Quilt mailing list, send a
+    message with the word `subscribe' in the Subject: field to
+    <quilt-request@bitsko.slc.ut.us>.
 
     Copyright (C) 1997 Ken MacLeod
     SPGrove is distributed under the same terms as SP.  See the file
@@ -42,7 +46,7 @@ OVERVIEW
     of the element.  Attributes are stored as a Perl hash, with the
     values as an array of scalars and SGML::SData objects.  The
     contents of an element may be more Elements, scalars, SData
-    objects, or processing instruction (PI) objects.
+    objects, processing instruction (PI) objects, or Entities.
 
     SGML::SData objects are replacements for character entity
     references within the document.  The Text::EntityMap perl module
@@ -54,6 +58,14 @@ OVERVIEW
     SGML::PI objects are processing instructions contained within the
     document.
 
+    SGML::Entity, SGML::ExtEntity, and SGML::SubDocEntity are entity
+    references.
+
+    SGML::Notation objects define a notation used for entities and in
+    attributes.
+
+    SGML::Writer outputs all or part of a grove to a file or scalar.
+
     SGML::Simple::Spec, SGML::Simple::SpecBuilder, and
     SGML::Simple::BuilderBuilder work together to implement a simple
     rule-based transformer for transforming document instances to Perl
@@ -61,9 +73,6 @@ OVERVIEW
     ``SPGrove Simple Spec'' DTD and creates a specification object
     that can be given to BuilderBuilder to create a Visitor package
     that can be used to transform other groves to Perl objects.
-
-    See the pod/man pages for SGML::SPGrove, SGML::Element,
-    SGML::SData, SGML::PI, and SGML::Simple::Spec for more info.
 
     Visitors and Builders are explained thoroughly in ``Design
     Patterns: Elements of Reusable Object-Oriented Software'' by

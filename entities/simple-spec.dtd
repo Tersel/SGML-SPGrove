@@ -3,7 +3,7 @@
     Copyright (C) 1997 Ken MacLeod
     See the file COPYING for distribution terms.
 
-    $Id: simple-spec.dtd,v 1.2 1997/10/12 21:27:03 ken Exp $
+    $Id: simple-spec.dtd,v 1.4 1997/11/30 03:37:54 ken Exp $
 
 -->
 
@@ -11,19 +11,20 @@
 <!ELEMENT spec - - (head, rules, stuff?)>
 <!ATTLIST spec
 	version CDATA #FIXED "1.0" -- Version Number.  -->
-<!ELEMENT head - o (defaultobject,defaultprefix)>
+<!ELEMENT head - o (defaultobject,defaultprefix,use-gi?,copy-id?)>
 <!ELEMENT rules - o (rule+)>
-<!ELEMENT stuff - - ((attr|#PCDATA)*)>
+<!ELEMENT stuff - - ((attr|attr-as-string|#PCDATA)*)>
 
 <!ELEMENT (defaultobject, defaultprefix) - - (#PCDATA)>
-
+<!ELEMENT (use-gi, copy-id) - o EMPTY>
 
 <!ELEMENT rule - o (query, (%actions;)*)>
 <!ELEMENT query - - (#PCDATA)>
 <!ELEMENT (holder, ignore) - o EMPTY>
 <!ELEMENT port - - (#PCDATA)>
-<!ELEMENT (make, code) - - ((attr|#PCDATA)*)>
-<!ELEMENT attr - - (#PCDATA)>
+<!ELEMENT make - - ((attr|attr-as-string|#PCDATA)*)>
+<!ELEMENT (attr, attr-as-string) - - (#PCDATA)>
+<!ELEMENT code - - (#PCDATA)>
 
 <!ENTITY ctx    SDATA "[ctx   ]"--=current context-->
 <!ENTITY data   SDATA "[data  ]"--=data of this element-->

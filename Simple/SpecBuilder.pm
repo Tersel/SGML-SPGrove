@@ -2,7 +2,7 @@
 # Copyright (C) 1997 Ken MacLeod
 # See the file COPYING for distribution terms.
 #
-# $Id: SpecBuilder.pm,v 1.4 1997/10/25 00:04:01 ken Exp $
+# $Id: SpecBuilder.pm,v 1.6 1997/11/30 03:37:54 ken Exp $
 #
 
 package SGML::Simple::SpecBuilder;
@@ -54,12 +54,12 @@ use SGML::Simple::Spec;
 my $singleton = undef;
 
 sub new {
-    my ($type) = @_;
+    my $type = shift;
 
     return ($singleton)
 	if (defined $singleton);
 
-    my ($self) = {};
+    my $self = {};
 
     bless ($self, $type);
 
@@ -68,70 +68,86 @@ sub new {
     return $self;
 }
 
-sub visit_grove {
-    my ($self) = shift;
-    my ($grove) = shift;
+sub visit_SGML_SPGrove {
+    my $self = shift;
+    my $grove = shift;
 
     $grove->root->accept_gi ($self, @_);
 }
 
 sub visit_gi_SPEC {
-    my ($builder) = shift;
-    my ($element) = shift;
+    my $builder = shift;
+    my $element = shift;
     $element->children_accept_gi($builder, @_);
 }
 
 sub visit_gi_HEAD {
-    my ($builder) = shift;
-    my ($element) = shift;
+    my $builder = shift;
+    my $element = shift;
     $element->children_accept_gi($builder, @_);
 }
 
 sub visit_gi_DEFAULTOBJECT {
-    my ($builder) = shift;
-    my ($element) = shift;
-    my ($spec) = shift;
+    my $builder = shift;
+    my $element = shift;
+    my $spec = shift;
 
     $spec->default_object ($element->as_string);
 }
 
 sub visit_gi_DEFAULTPREFIX {
-    my ($builder) = shift;
-    my ($element) = shift;
-    my ($spec) = shift;
+    my $builder = shift;
+    my $element = shift;
+    my $spec = shift;
 
     $spec->default_prefix ($element->as_string);
 }
 
+sub visit_gi_USE_GI {
+    my $builder = shift;
+    my $element = shift;
+    my $spec = shift;
+
+    $spec->use_gi (1);
+}
+
+sub visit_gi_COPY_ID {
+    my $builder = shift;
+    my $element = shift;
+    my $spec = shift;
+
+    $spec->copy_id (1);
+}
+
 sub visit_gi_RULES {
-    my ($builder) = shift;
-    my ($element) = shift;
+    my $builder = shift;
+    my $element = shift;
     $element->children_accept_gi($builder, @_);
 }
 
 sub visit_gi_RULE {
-    my ($builder) = shift;
-    my ($element) = shift;
-    my ($parent_rule) = shift;
-    my ($rule) = SGML::Simple::Spec::Rule->new ();
+    my $builder = shift;
+    my $element = shift;
+    my $parent_rule = shift;
+    my $rule = SGML::Simple::Spec::Rule->new ();
     $parent_rule->push_rules ($rule);
     $element->children_accept_gi($builder, $rule, @_);
 }
 
 sub visit_gi_PORT {
-    my ($builder) = shift;
-    my ($element) = shift;
-    my ($rule) = shift;
-    my ($port) = $element->as_string;
+    my $builder = shift;
+    my $element = shift;
+    my $rule = shift;
+    my $port = $element->as_string;
     $port =~ tr/-/_/;
     $rule->port ($port);
 }
 
 sub visit_gi_QUERY {
-    my ($builder) = shift;
-    my ($element) = shift;
-    my ($rule) = shift;
-    my ($query) = $element->as_string;
+    my $builder = shift;
+    my $element = shift;
+    my $rule = shift;
+    my $query = $element->as_string;
 
     # convert all non-word, non-space characters to `_' (matched in
     # Element.pm)
@@ -140,41 +156,52 @@ sub visit_gi_QUERY {
 }
 
 sub visit_gi_HOLDER {
-    my ($builder) = shift;
-    my ($element) = shift;
-    my ($rule) = shift;
+    my $builder = shift;
+    my $element = shift;
+    my $rule = shift;
     $rule->holder (1);
 }
 
 sub visit_gi_IGNORE {
-    my ($builder) = shift;
-    my ($element) = shift;
-    my ($rule) = shift;
+    my $builder = shift;
+    my $element = shift;
+    my $rule = shift;
     $rule->ignore (1);
 }
 
 sub visit_gi_MAKE {
-    my ($builder) = shift;
-    my ($element) = shift;
-    my ($rule) = shift;
-    my ($make_str) = [];
-    my ($new_builder) = SGML::Simple::Spec::BuilderSub->new;
+    my $builder = shift;
+    my $element = shift;
+    my $rule = shift;
+    my $make_str = [];
+    my $new_builder = SGML::Simple::Spec::BuilderSub->new;
     $element->children_accept_gi($new_builder, $make_str);
     $rule->make (join ('', @{$make_str}));
 }
 
 sub visit_gi_CODE {
-    my ($builder) = shift;
-    my ($element) = shift;
-    my ($rule) = shift;
-    my ($make_str) = [];
-    my ($new_builder) = SGML::Simple::Spec::BuilderSub->new;
-    $element->children_accept_gi($new_builder, $make_str);
+    my $builder = shift;
+    my $element = shift;
+    my $rule = shift;
+    my $make_str = [];
+    $element->children_accept_gi($builder, $make_str);
     $rule->code (join ('', @{$make_str}));
 }
 
 sub visit_gi_ATTR {
-    my ($builder, $element, $make_str) = @_;
+    my $builder = shift;
+    my $element = shift;
+    my $make_str = shift;
+    push (@{$make_str},
+	  '($element->attr (\''
+	  . $element->as_string()
+	  . '\'))');
+}
+
+sub visit_gi_ATTR_AS_STRING {
+    my $builder = shift;
+    my $element = shift;
+    my $make_str = shift;
     push (@{$make_str},
 	  '($element->attr_as_string (\''
 	  . $element->as_string()
@@ -182,10 +209,20 @@ sub visit_gi_ATTR {
 }
 
 sub visit_gi_STUFF {
-    my ($builder, $element, $spec) = @_;
-    my ($data) = $element->as_string;
+    my $builder = shift;
+    my $element = shift;
+    my $spec = shift;
+    my $data = $element->as_string;
     $data =~ tr/\r/\n/;
     $spec->stuff ($data);
+}
+
+sub visit_scalar {
+    my $builder = shift;
+    my $scalar = shift;
+    my $make_str = shift;
+    $scalar =~ tr/\r/\n/;
+    push (@{$make_str}, $scalar);
 }
 
 package SGML::Simple::Spec::BuilderSub;
@@ -196,9 +233,9 @@ sub new {
 }
 
 sub visit_scalar {
-    my ($builder) = shift;
-    my ($scalar) = shift;
-    my ($make_str) = shift;
+    my $builder = shift;
+    my $scalar = shift;
+    my $make_str = shift;
     $scalar =~ s/(\w+):(?!:)/$1 =>/g;
     $scalar =~ tr/\r/\n/;
     push (@{$make_str}, $scalar);

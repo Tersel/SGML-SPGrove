@@ -1,3 +1,116 @@
+Sun Nov 30 17:05:55 1997  Ken MacLeod  <ken@bitsko.slc.ut.us>
+
+	* Simple/BuilderBuilder.pm (new): removed debug statement
+
+	* Element.pm: documented implied attributes being undef
+	(attr_as_string): test for no attributes
+
+	* SPGroveNew.cc (startElement): don't create attribute hash for
+ 	only implied attributes, fix missing token attribute
+	
+Sat Nov 29 20:51:05 1997  Ken MacLeod  <ken@bitsko.slc.ut.us>
+
+	* release 0.14
+	
+	* entities/simple-spec.dtd (attr-as-string): added
+
+	* Simple/SpecBuilder.pm (visit_gi_ATTR_AS_S): added
+
+Thu Nov 27 12:14:11 1997  Ken MacLeod  <ken@bitsko.slc.ut.us>
+
+	* SPGroveNew.cc: handle reference counting
+
+Fri Nov 21 17:26:33 1997  Ken MacLeod  <ken@bitsko.slc.ut.us>
+
+	* SPGroveNew.cc (sp_grove_new): inhibit messages to stdout
+
+Tue Nov  4 21:12:30 1997  Ken MacLeod  <ken@bitsko.slc.ut.us>
+
+	* README: noted entities, notation, and Writer
+
+	* Writer.pm: added
+
+Mon Nov  3 10:08:54 1997  Ken MacLeod  <ken@bitsko.slc.ut.us>
+
+	* Simple/BuilderBuilder.pm (visit_scalar, visit_SGML_SData): test
+ 	for Iter and push only delegates
+
+	* 0.12 released
+	
+	* Element.pm (attr_as_string, as_string): implement `cdata_mapper'
+
+Sun Nov  2 18:29:31 1997  Ken MacLeod  <ken@bitsko.slc.ut.us>
+
+	* all: use style of `my $var' instead of `my ($var)'
+
+	* examples/simple-dump.pl, examples/visitor.pl, example/my-html.pl:
+	convert visit functions to class names
+	removed parens on single `my' vars
+	(visit_SGML_SPGrove): use `children_accept' instead of `root->accept'
+	
+Sat Nov  1 09:35:06 1997  Ken MacLeod  <ken@bitsko.slc.ut.us>
+
+	* SPGroveNew.cc (externalDataEntityRef, subdocEntityRef,
+ 	nonSgmlChar): added
+
+	* SPGroveNew.cc (entity, notation, store_external_id): added
+
+	* SPGroveNew.cc, SPGrove.pm: changed `root' to `contents' to allow
+ 	for elements after the document element
+
+	* PI.pm: change `visit_pi' to visit `visit_SGML_PI'
+
+	* SPGrove.pm: change `visit_grove' to `visit_SGML_SPGrove'
+
+	* SData.pm: change `visit_sdata' to `visit_SGML_SData'
+
+	* Simple/BuilderBuilder.pm (visit_sdata): rename to
+ 	`visit_SGML_SData'
+
+	* SPGrove.pm: use SGML::Notation, SGML::Entity, SGML::ExtEntity,
+ 	SGML::SubDocEntity
+
+	* MANIFEST, SGML-SPGrove.spec: added Notation.pm, Entity.pm,
+ 	ExtEntity.pm, SubDocEntity.pm
+
+	* ExtEntity.pm: added
+
+Fri Oct 31 11:38:02 1997  Ken MacLeod  <ken@bitsko.slc.ut.us>
+
+	* SPGroveNew.cc (startElement): fix attribute looping, add more
+ 	attribute types
+
+	* Simple/BuilderBuilder.pm: removed no_gi argument
+	(new): fix creating new package before init
+
+	* Simple/SpecBuilder.pm (visit_gi_CODE): don't parse arguments
+	(visit_scalar, visit_gi_COPY_ID, visit_gi_USE_GI): added
+
+	* Simple/BuilderBuilder.pm (new): copy id to new element
+
+Thu Oct 30 10:30:27 1997  Ken MacLeod  <ken@bitsko.slc.ut.us>
+
+	* Element.pm, SPGrove.pm (accept, children_accept): replaced by
+ 	Class::Visitor
+
+	* PI.pm: added package SGML::PI::Iter
+
+	* SData (contents): added
+
+	* SPGrove, Element, SData: use Class::Visitor
+	
+	* DOM: added
+
+	* MANIFEST, SGML-SPGrove.spec(%doc): added `DOM'
+
+Sat Oct 25 11:36:04 1997  Ken MacLeod  <ken@bitsko.slc.ut.us>
+
+	* README: added mailing list info
+
+	* Simple/BuilderBuilder.pm (new): fix missing `my $sub_name'
+	(eval_): added to support saving, viewing created code
+	(new_package): renamed `new_package_'
+
 Fri Oct 24 10:09:19 1997  Ken MacLeod  <ken@bitsko.slc.ut.us>
 
 	* Simple/BuilderBuilder.pm (new): implement `no_gi'

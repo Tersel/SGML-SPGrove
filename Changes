@@ -1,5 +1,59 @@
 Revision history for Perl extension SGML::SPGrove.
 
+`*' indicates backward incompatible changes
+
+0.15  Sun Nov 30 21:17:18 CST 1997
+	- Element doc: implied attributes are left undefined (i.e. no
+	  hash entry in an element's attributes)
+	* don't create attribute hash at all if only implied attributes
+	- fixes
+	  - fix missing token attributes
+	  - BuilderBuilder: remove debugging statement that printed
+	    newlines during grove to object tree transform
+
+0.14  Sat Nov 29 21:34:23 CST 1997
+	* Simple: `attr' renamed to `attr-as-string', `attr' now
+	  copies array of scalars and entity refs.
+	* inhibit error messages going to stdout (this is not exactly
+	  backward incompatible, but it sure can be awfully confusing
+	  to no longer see error messages)
+	- fixes
+	  - shouldn't leak memory so badly (at all??)
+
+0.13  Thu Nov  6 13:20:13 CST 1997
+	- added first cut SGML::Writer to write groves
+	- fixes
+	  - BuilderBuilder: push only delegates, not Iters
+
+0.12  Mon Nov  3 11:32:22 CST 1997
+	* change visit type names:
+		visit_grove	visit_SGML_SPGrove
+		visit_element	visit_SGML_Element
+		visit_sdata	visit_SGML_SData
+		visit_pi	visit_SGML_PI
+	* Element: attributes may now be a notation or an array of
+          entity references as well as an array of data/sdata objects
+	* simple-spec.dtd, Spec, SpecBuilder, BuilderBuilder: add
+	  `use-gi' and `copy-id'
+	* BuilderBuilder: moved `no_gi' argument to spec
+	* visitors must now support visit_SGML_Entity,
+          visit_SGML_ExtEntity, visit_SGML_SubDocEntity
+	- implement `cdata_mapper' and `sdata_mapper' in `as_string's
+	- SPGroveNew: support Notation, Entity, ExtEntity, SubDocEntity
+	- updated examples visitor.pl, simple-dump.pl, my-html.pl
+	- SPGrove.pm, Element.pm, and SData.pm now use Class::Visitor
+	- added `DOM' document relating SPGrove to W3's Document Object Model
+	- SPGrove can now have multiple elements, `root' returns the first
+	- fixes
+	  - SpecBuilder: no longer trys to parse arguments in `<CODE>'
+	  - SPGrove: allows additional elements after the document element
+
+0.11  Sat Oct 25 16:35:37 CDT 1997
+	- README: added info about Quilt mailing list
+	- BuilderBuilder: added `eval_output' to capture generated code
+	- fixes
+	  - BuilderBuilder: fix missing `my $sub_name'
+
 0.10  Fri Oct 24 19:02:18 CDT 1997
 	- Simple/BuilderBuilder: implement `no_gi'
 	- fixes

@@ -2,7 +2,7 @@
 # Copyright (C) 1997 Ken MacLeod
 # See the file COPYING for distribution terms.
 #
-# $Id: Spec.pm,v 1.3 1997/10/19 21:56:09 ken Exp $
+# $Id: Spec.pm,v 1.4 1997/11/03 17:32:10 ken Exp $
 #
 
 =head1 NAME
@@ -129,6 +129,8 @@ use Class::Visitor;
 visitor_class 'SGML::Simple::Spec', 'Class::Visitor::Base', {
     default_object => '$',
     default_prefix => '$',
+    use_gi => '$',
+    copy_id => '$',
     rules => '@',
     stuff => '$',
 };

@@ -2,7 +2,7 @@
 # Copyright (C) 1997 Ken MacLeod
 # See the file COPYING for distribution terms.
 #
-# $Id: BuilderBuilder.pm,v 1.5 1997/10/25 00:04:01 ken Exp $
+# $Id: BuilderBuilder.pm,v 1.10 1997/12/01 03:18:51 ken Exp $
 #
 
 package SGML::Simple::BuilderBuilder;
@@ -23,7 +23,8 @@ SGML::Simple::BuilderBuilder - build a simple transformation package
     $spec_grove = SGML::SPGrove->new ($spec_sysid);
     $spec = SGML::Simple::Spec->new;
     $spec_grove->accept (SGML::Simple::SpecBuilder->new, $spec);
-    $builder = SGML::Simple::BuilderBuilder->new (spec => $spec[, no_gi => 1]);
+    $builder = SGML::Simple::BuilderBuilder->new (spec => $spec
+						  [, eval_output => $fh]);
 
     $grove = SGML::SPGrove->new ($sysid);
     $object_tree_root = My::Object->new();
@@ -33,8 +34,10 @@ SGML::Simple::BuilderBuilder - build a simple transformation package
 
 C<BuilderBuilder> returns the package name of a package built using a
 specification read from a specification file.  The key `C<spec>'
-contains the specification.  The key `C<no_gi>' chooses between
-`C<visit_gi_>' (0) and `C<visit_>' (1) calls being created.
+contains the specification.  The key `C<eval_output>' is either a file
+handle or a scalar reference, instead of evaluating generated code
+C<BuilderBuilder> will print to or append to `C<eval_output>',
+respectively.
 
 Passing a new ``builder'' to C<accept_gi> of a grove will cause an
 output object tree to be generated under C<$object_tree_root> using
@@ -66,11 +69,13 @@ sub new {
 
     bless ($self, $type);
 
-    my $package = $next_package++;
-    new_package ($package, 'NoSuchGI_', $self->{'no_gi'});
-
     $self->{'default_object'} = $self->{spec}->default_object;
     $self->{'default_prefix'} = $self->{spec}->default_prefix;
+    $self->{'use_gi'} = $self->{spec}->use_gi;
+    $self->{'copy_id'} = $self->{spec}->copy_id;
+
+    my $package = $next_package++;
+    $self->new_package_ ($package, 'NoSuchGI_');
 
     $self->{spec}->accept ($self, $package);
 
@@ -86,7 +91,7 @@ sub visit_SGML_Simple_Spec {
 
     my $stuff = $spec->stuff;
     if (defined $stuff) {
-	eval "package $package;\n$stuff\n";
+	$self->eval_ ("package $package;\n$stuff\n");
         die "BuilderBuilder::visit_SGML_Simple_Spec: unable to compile stuff\n"
           . "$@\n"
             if $@;
@@ -123,7 +128,7 @@ sub new {
     return \$self;
 }
 EOFEOF
-        eval $str;
+        $self->eval_ ($str);
         die "BuilderBuilder::visit_SGML_Simple_Spec: unable to compile rule\n"
           . "$str\n$@\n"
             if $@;
@@ -137,7 +142,8 @@ EOFEOF
 
     my $code;
     if ($rule->holder) {
-        my $gi = $self->{'no_gi'} ? "" : "_gi";
+        my $gi = $self->{'use_gi'} ? "_gi" : "";
+        # XXX warn about `id' if `copy_id'
 	$sub = <<EOFEOF;
   my \$self = shift; my \$element = shift;
   $sub_builder
@@ -158,16 +164,26 @@ EOFEOF
 	    $make = "my \$obj = new $self->{'default_prefix'}::$make_val;";
 	}
 
+        my $copy_id = "";
+        if ($self->{'copy_id'}) {
+	    $copy_id = <<'EOFEOF';
+  my $id = $element->attr ('ID');
+
+  eval {$obj->id ($id)} if (defined $id);
+EOFEOF
+        }
+
 	my $push = "\$parent->push (\$obj);";
         my $port = $rule->port;
 	if (defined $port) {
 	    $push = "\$parent->push_$port (\$obj);";
 	}
 
-        my $gi = $self->{'no_gi'} ? "" : "_gi";
+        my $gi = $self->{'use_gi'} ? "_gi" : "";
 	$sub = <<EOFEOF;
   my \$self = shift; my \$element = shift; my \$parent = shift;
   $make
+  $copy_id
   $push
   $sub_builder
   \$element->children_accept$gi (\$self, \$obj, \@_);
@@ -178,9 +194,10 @@ EOFEOF
     my @gis = split (/\s+/, $rule->query);
     my $gi;
     foreach $gi (@gis) {
+        my $sub_name = "visit_gi_$gi";
         $sub_name = "visit_$gi"
-            if ($gi eq 'scalar' || $gi eq 'sdata' || $self->{no_gi});
-        my $retval = eval <<EOFEOF;
+            if ($gi eq 'scalar' || $gi eq 'sdata' || !$self->{use_gi});
+        my $retval = $self->eval_ (<<EOFEOF);
 package $package;
 
 sub $sub_name {
@@ -194,10 +211,10 @@ EOFEOF
     }
 }
 
-sub new_package {
+sub new_package_ {
+    my $self = shift;
     my $new_package = shift;
     my $super_package = shift;
-    my $no_gi = shift;
 
     my $str = <<'EOFEOF';
 package !new_package!;
@@ -218,7 +235,7 @@ sub new {
     return $self;
 }
 
-sub visit_grove {
+sub visit_SGML_SPGrove {
     my $self = shift; my $grove = shift;
 
     # XXX capture grove information to built object?
@@ -229,12 +246,28 @@ sub visit_grove {
 EOFEOF
     $str =~ s/!new_package!/$new_package/g;
     $str =~ s/!super_package!/$super_package/g;
-    my $gi = $no_gi ? "" : "_gi";
+    my $gi = $self->{'use_gi'} ? "_gi" : "";
     $str =~ s/!gi!/$gi/g;
-    eval $str;
+    $self->eval_ ($str);
     die "BuilderBuilder::visit_SGML_Simple_Spec: unable to compile rule\n"
       . "$str\n$@\n"
         if $@;
+}
+
+sub eval_ {
+    my $self = shift;
+    my $str = shift;
+
+    if (defined $self->{'eval_output'}) {
+	if (ref $self->{'eval_output'} eq 'SCALAR') {
+	    ${$self->{'eval_output'}} .= $str;
+	} else {
+	    $self->{'eval_output'}->print ($str);
+	}
+	return 0;
+    } else {
+	return (eval $str);
+    }
 }
 
 package NoSuchGI_;
@@ -245,15 +278,23 @@ use vars qw{$AUTOLOAD};
 sub visit_scalar {
     my $self = shift; my $scalar = shift; my $parent = shift;
 
-    # XXX cdata_mapper?
-    $parent->push ($scalar);
+    if (ref ($scalar) =~ /::Iter/) {
+	$parent->push ($scalar->delegate);
+    } else {
+	# XXX cdata_mapper?
+	$parent->push ($scalar);
+    }
 }
 
-sub visit_sdata {
+sub visit_SGML_SData {
     my $self = shift; my $sdata = shift; my $parent = shift;
 
-    # XXX sdata_mapper?
-    $parent->push ($sdata);
+    if (ref ($sdata) =~ /::Iter/) {
+	$parent->push ($sdata->delegate);
+    } else {
+	# XXX sdata_mapper?
+	$parent->push ($sdata);
+    }
 }
 
 sub AUTOLOAD {
