@@ -2,6 +2,10 @@ Revision history for Perl extension SGML::SPGrove.
 
 `*' indicates backward incompatible changes
 
+0.16  Sun Dec 28 17:21:32 CST 1997
+	- fixes
+	  - fix argument evaluation order with token attributes
+
 0.15  Sun Nov 30 21:17:18 CST 1997
 	- Element doc: implied attributes are left undefined (i.e. no
 	  hash entry in an element's attributes)

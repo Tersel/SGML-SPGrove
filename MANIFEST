@@ -6,7 +6,7 @@ MANIFEST
 README
 Makefile.PL
 SGML-SPGrove.spec
-SGML-SPGrove-0.15.spec
+SGML-SPGrove-0.16.spec
 SPGrove.pm
 SPGrove.xs
 Element.pm

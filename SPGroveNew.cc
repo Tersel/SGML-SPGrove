@@ -2,7 +2,7 @@
 // Copyright (C) 1997 Ken MacLeod
 // See the file COPYING for distribution terms.
 //
-// $Id: SPGroveNew.cc,v 1.8 1997/12/01 03:18:47 ken Exp $
+// $Id: SPGroveNew.cc,v 1.9 1997/12/28 23:25:21 ken Exp $
 //
 
 // The next two lines are only to ensure bool gets defined appropriately.
@@ -187,9 +187,10 @@ SPGrove::startElement(const StartElementEvent &event)
 		      as_string(att_ptr->name), att_ptr->name.len,
 		      notation_ref, 0);
 	  } else {
+	    SV *token = newSVpv(as_string(att_ptr->tokens), att_ptr->tokens.len);
 	    hv_store (attributes,
 		      as_string(att_ptr->name), att_ptr->name.len,
-		      newSVpv(as_string(att_ptr->tokens), att_ptr->tokens.len), 0);
+		      token, 0);
 	  }
 	}
         break;
