@@ -2,7 +2,7 @@
 # Copyright (C) 1997 Ken MacLeod
 # See the file COPYING for distribution terms.
 #
-# $Id: Notation.pm,v 1.1 1997/11/03 17:32:01 ken Exp $
+# $Id: Notation.pm,v 1.2 1998/01/04 16:00:17 ken Exp $
 #
 
 package SGML::Notation;
@@ -58,7 +58,7 @@ C<SGML::Notation> objects are never primary children of an
 C<SGML::Element> object and will not ordinarily occur while simply
 visiting a grove.
 
-C<$notation->as_string> returns an empty string.
+C<$notation-E<gt>as_string> returns an empty string.
 
 C<$notation-E<gt>accept_gi($visitor[, ...])> is implemented as a
 synonym for C<accept>.

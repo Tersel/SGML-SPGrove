@@ -2,7 +2,7 @@
 # Copyright (C) 1997 Ken MacLeod
 # See the file COPYING for distribution terms.
 #
-# $Id: PI.pm,v 1.5 1997/11/03 17:32:01 ken Exp $
+# $Id: PI.pm,v 1.6 1998/01/04 16:00:17 ken Exp $
 #
 
 # Internally, an SGML::PI is blessed scalar
@@ -38,7 +38,7 @@ C<$pi-E<gt>data> returns the data of the PI object.
 
 C<$pi-E<gt>as_string> returns an empty string.
 
-C<$pi->iter> returns an iterator for the PI object, see
+C<$pi-E<gt>iter> returns an iterator for the PI object, see
 C<Class::Visitor> for details.
 
 C<$pi-E<gt>accept($visitor[, ...])> issues a call back to

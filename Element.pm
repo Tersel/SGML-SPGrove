@@ -2,7 +2,7 @@
 # Copyright (C) 1997 Ken MacLeod
 # See the file COPYING for distribution terms.
 #
-# $Id: Element.pm,v 1.9 1997/12/01 03:18:47 ken Exp $
+# $Id: Element.pm,v 1.10 1998/01/04 16:00:16 ken Exp $
 #
 
 
@@ -81,7 +81,7 @@ element as a string, possibly modified by C<$context>.  See
 L<SGML::SData> and L<SGML::PI> for more detail.  (XXX does not expand
 entities.)
 
-C<$element->iter> returns an iterator for the element, see
+C<$element-E<gt>iter> returns an iterator for the element, see
 C<Class::Visitor> for details.
 
 C<$element-E<gt>accept($visitor[, ...])> issues a call back to

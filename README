@@ -1,11 +1,11 @@
-$Id: README,v 1.11 1997/12/28 23:25:21 ken Exp $
+$Id: README,v 1.12 1998/01/04 16:00:18 ken Exp $
 
 
                             SGML::SPGrove
 
                    A Perl 5 module for loading SGML,
                    XML, and HTML document instances
-                       using James Clark's SP.
+		   using James Clark's SGML Parser.
 
 
                              Ken MacLeod
@@ -96,9 +96,9 @@ INSTALLATION
 <ftp://ftp.uu.net/vendor/bitsko/gdo/>
 
     1)  SPGrove needs SP's `libsp.a' and include files.  SP's `make
-        install' does not install these [I'm working on that, I should
-        have an RPM available soon].  Create a workarea for compiling
-        SP, compile it and keep the workarea until SPGrove is done.
+        install' does not install these.  Create a workarea for
+        compiling SP, compile it and keep the workarea until SPGrove
+        is done.
 
         Edit SPGrove's Makefile.PL to point `LIBS' to SP's `lib'
         directory and `INC' to SP's three include directories.  I've

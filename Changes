@@ -2,6 +2,9 @@ Revision history for Perl extension SGML::SPGrove.
 
 `*' indicates backward incompatible changes
 
+1.00  Sun Jan  4 09:57:51 CST 1998
+	- minor doc updates and fixes
+
 0.16  Sun Dec 28 17:21:32 CST 1997
 	- fixes
 	  - fix argument evaluation order with token attributes

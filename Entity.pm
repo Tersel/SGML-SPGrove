@@ -2,7 +2,7 @@
 # Copyright (C) 1997 Ken MacLeod
 # See the file COPYING for distribution terms.
 #
-# $Id: Entity.pm,v 1.1 1997/11/03 17:32:01 ken Exp $
+# $Id: Entity.pm,v 1.2 1998/01/04 16:00:17 ken Exp $
 #
 
 package SGML::Entity;
@@ -53,7 +53,7 @@ C<$entity-E<gt>accept($visitor[, ...])> issues a call back to
 S<C<$visitor-E<gt>visit_SGML_Entity($entity[, ...])>>.  See examples
 C<visitor.pl> and C<simple-dump.pl> for more information.
 
-C<$entity->as_string> returns an empty string.
+C<$entity-E<gt>as_string> returns an empty string.
 
 C<$entity-E<gt>accept_gi($visitor[, ...])> is implemented as a synonym
 for C<accept>.

@@ -2,7 +2,7 @@
 # Copyright (C) 1997 Ken MacLeod
 # See the file COPYING for distribution terms.
 #
-# $Id: SData.pm,v 1.6 1997/11/03 17:32:02 ken Exp $
+# $Id: SData.pm,v 1.7 1998/01/04 16:00:18 ken Exp $
 #
 
 package SGML::SData;
@@ -57,7 +57,7 @@ The actual implementation is:
 
     &{$context->{sdata_mapper}} ($self->data, @_);
 
-C<$sdata->iter> returns an iterator for the sdata object, see
+C<$sdata-E<gt>iter> returns an iterator for the sdata object, see
 C<Class::Visitor> for details.
 
 C<$sdata-E<gt>accept($visitor[, ...])> issues a call back to

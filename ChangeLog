@@ -1,3 +1,8 @@
+Fri Jan  2 10:24:26 1998  Ken MacLeod  <ken@bitsko.slc.ut.us>
+
+	* SubDocEntity.pm, ExtEntity.pm, SData.pm, PI.pm, Notation.pm,
+ 	Entity.pm, Element.pm: fixed E<gt> typo in pod
+
 Sun Dec 28 17:03:02 1997  Ken MacLeod  <ken@bitsko.slc.ut.us>
 
 	* README: noted Iterator access in introduction
