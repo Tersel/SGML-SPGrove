@@ -1,5 +1,22 @@
 Revision history for Perl extension SGML::SPGrove.
 
+0.07
+	- AutoHash::new now creates $self from arguments
+	- added `as_string' to AutoHash
+	- added `ignore' element to simple specs
+	- added `new' to SData
+	- added `scaler' and `sdata' queries in specs
+	- BuilderBuilder now takes keyed arguments, adding `no_gi' to
+	  create builders without using `visit_gi_'
+	- fixes
+	  - SData->data was returning $self
+	  - AutoHash's `accept' only created in superclass
+	  - Element deref'd child but then didn't use it
+	  - Element and SpecBuilder convert wierd chars to `_' (still
+	    not complete, though)
+	  - BuilderBuilder: moved `visit_scalar' and `visit_sdata'
+	    ``up'' to `NoSuchGI_' so builders can override.
+
 0.06  Fri Oct 10 19:01:04 CDT 1997
 	- added `my-html' example
 	- added `AutoHash' virtual superclass

@@ -2,7 +2,7 @@
 # Copyright (C) 1997 Ken MacLeod
 # See the file COPYING for distribution terms.
 #
-# $Id: SData.pm,v 1.4 1997/10/09 01:55:12 ken Exp $
+# $Id: SData.pm,v 1.5 1997/10/12 21:26:57 ken Exp $
 #
 
 # Internally, an SGML::SData is an array containing
@@ -19,6 +19,8 @@ use strict;
 SGML::SData - an SGML, XML, or HTML document SData replacement
 
 =head1 SYNOPSIS
+
+  $sdata = SGML::SData->new ($replacement[, $entity_name]);
 
   $data = $sdata->data;
   $name = $sdata->name;
@@ -71,12 +73,24 @@ SGML::PI(3).
 
 =cut
 
+sub new {
+    my $type = shift;
+    my $replacement = shift;
+    my $entity_name = shift;
+
+    my $self = [$replacement, $entity_name];
+
+    bless $self, $type;
+
+    return $self;
+}
+
 sub data {
-    return $_[0];
+    return $_[0]->[0];
 }
 
 sub name {
-    return $_[1];
+    return $_[0]->[1];
 }
 
 sub as_string {

@@ -2,7 +2,7 @@
 # Copyright (C) 1997 Ken MacLeod
 # See the file COPYING for distribution terms.
 #
-# $Id: BuilderBuilder.pm,v 1.1 1997/10/11 00:01:53 ken Exp $
+# $Id: BuilderBuilder.pm,v 1.2 1997/10/12 21:27:01 ken Exp $
 #
 
 package SGML::Simple::BuilderBuilder;
@@ -23,7 +23,7 @@ SGML::Simple::BuilderBuilder - build a simple transformation package
     $spec_grove = SGML::SPGrove->new ($spec_sysid);
     $spec = SGML::Simple::Spec->new;
     $spec_grove->accept (SGML::Simple::SpecBuilder->new, $spec);
-    $builder = SGML::Simple::BuilderBuilder->new ($spec);
+    $builder = SGML::Simple::BuilderBuilder->new (spec => $spec[, no_gi => 1]);
 
     $grove = SGML::SPGrove->new ($sysid);
     $object_tree_root = My::Object->new();
@@ -32,7 +32,9 @@ SGML::Simple::BuilderBuilder - build a simple transformation package
 =head1 DESCRIPTION
 
 C<BuilderBuilder> returns the package name of a package built using a
-specification read from a specification file.
+specification read from a specification file.  The key `C<spec>'
+contains the specification.  The key `C<no_gi>' chooses between
+`C<visit_gi_>' (0) and `C<visit_>' (1) calls being created.
 
 Passing a new ``builder'' to C<accept_gi> of a grove will cause an
 output object tree to be generated under C<$object_tree_root> using
@@ -57,18 +59,20 @@ my $next_package = "BB0000";
 
 sub new {
     my $type = shift;
-    my $spec = shift;
+    my $self = {@_};
+
+    die "SGML::Simple::BuilderBuiler::new: no spec given\n"
+	if (!defined $self->{'spec'});
+
+    bless ($self, $type);
 
     my $package = $next_package++;
     new_package ($package, 'NoSuchGI_');
 
-    my $self = {
-	'default_object' => $spec->default_object,
-	'default_prefix' => $spec->default_prefix,
-    };
-    bless ($self, $type);
+    $self->{'default_object'} = $self->{spec}->default_object;
+    $self->{'default_prefix'} = $self->{spec}->default_prefix;
 
-    $spec->accept ($self, $package);
+    $self->{spec}->accept ($self, $package);
 
     return ($package);
 }
@@ -130,6 +134,8 @@ EOFEOF
 EOFEOF
     } elsif ($rule->{code}) {
 	$sub = $rule->{code};
+    } elsif ($rule->{ignore}) {
+	$sub = "";
     } else {
         my $make = "my \$obj = new $self->{'default_object'};";
         if (defined $rule->{make}) {
@@ -158,10 +164,13 @@ EOFEOF
     my @gis = split (/\s+/, $rule->{query});
     my $gi;
     foreach $gi (@gis) {
+        my $sub_name = "visit_gi_$gi";
+        $sub_name = "visit_$gi"
+            if ($gi eq 'scalar' || $gi eq 'sdata' || $self->{no_gi});
         my $retval = eval <<EOFEOF;
 package $package;
 
-sub visit_gi_$gi {
+sub $sub_name {
 $sub
 }
 
@@ -202,20 +211,6 @@ sub visit_grove {
     $grove->children_accept_gi ($self, @_);
 }
 
-sub visit_scalar {
-    my $self = shift; my $scalar = shift; my $parent = shift;
-
-    # XXX cdata_mapper?
-    $parent->push ($scalar);
-}
-
-sub visit_sdata {
-    my $self = shift; my $sdata = shift; my $parent = shift;
-
-    # XXX sdata_mapper?
-    $parent->push ($sdata);
-}
-
 # XXX PI, entities?
 EOFEOF
     $str =~ s/!new_package!/$new_package/g;
@@ -231,6 +226,20 @@ package NoSuchGI_;
 use Carp;
 use vars qw{$AUTOLOAD};
 
+sub visit_scalar {
+    my $self = shift; my $scalar = shift; my $parent = shift;
+
+    # XXX cdata_mapper?
+    $parent->push ($scalar);
+}
+
+sub visit_sdata {
+    my $self = shift; my $sdata = shift; my $parent = shift;
+
+    # XXX sdata_mapper?
+    $parent->push ($sdata);
+}
+
 sub AUTOLOAD {
     my $self = shift; my $visted = shift;
     my $obj = shift; my $context = shift;
@@ -240,11 +249,11 @@ sub AUTOLOAD {
 
     my $name = $AUTOLOAD;
     my ($class, $op);
-    $name =~ m/(.*)::(visit_gi_)?([^:]+)$/;
+    $name =~ m/(.*)::(visit_gi_|visit_)?([^:]+)$/;
     ($class, $op, $name) = ($1, $2, $3);
     return if ($name eq 'DESTROY'); # per perlbot(1)
 
-    if ($op eq 'visit_gi_') {
+    if ($op eq 'visit_gi_' | $op eq 'visit_') {
 	carp "$name not handled\n";
     } else {
 	croak "$AUTOLOAD: huh?\n";

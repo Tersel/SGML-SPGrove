@@ -1,0 +1,27 @@
+
+ * get feedback from developers (that's YOU!) on what they need most
+
+Otherwise,
+
+ * bugs
+  ** Perl comments in Specs don't work because REs are CRs
+  ** Simple::Spec: handle element names with special characters
+
+ * functionality
+  ** SPGroveNew: complete ESIS
+  ** AutoHash: borrow more from Class::Template (build more Perlish objects)
+  ** Simple::Spec: better support for scalar, array, and hash elements
+  ** exception handling
+  ** record ends are carriage returns
+
+ * performance
+  ** SPGroveNew: build arrays locally
+  ** AutoHash: re-implement `visit_PACKAGE'
+
+ * SP
+  ** no events for undefined entities in XML
+  ** not recognizing <.../> empty elements, nesting instead (use jade1_0?)
+
+ * projects
+  ** Unicode
+  ** support Document Object Model <http://www.w3.org/DOM/>

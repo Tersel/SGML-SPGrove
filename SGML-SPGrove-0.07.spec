@@ -1,8 +1,8 @@
 Summary: Perl module for loading SGML, XML, and HTML
 Name: SGML-SPGrove
-Version: 0.06
+Version: 0.07
 Release: 1
-Source: ftp://ftp.uu.net/vendor/bitsko/gdo/SGML-SPGrove-0.06.tar.gz
+Source: ftp://ftp.uu.net/vendor/bitsko/gdo/SGML-SPGrove-0.07.tar.gz
 Copyright: distributable
 Group: Applications/Publishing/SGML
 URL: http://www.bitsko.slc.ut.us/

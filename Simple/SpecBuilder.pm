@@ -2,7 +2,7 @@
 # Copyright (C) 1997 Ken MacLeod
 # See the file COPYING for distribution terms.
 #
-# $Id: SpecBuilder.pm,v 1.1 1997/10/11 00:01:55 ken Exp $
+# $Id: SpecBuilder.pm,v 1.2 1997/10/12 21:27:02 ken Exp $
 #
 
 package SGML::Simple::SpecBuilder;
@@ -23,7 +23,7 @@ SGML::Simple::SpecBuilder - build a SGML::Spec object
     $spec_grove = SGML::SPGrove->new ($spec_sysid);
     $spec = SGML::Simple::Spec->new;
     $spec_grove->accept (SGML::Simple::SpecBuilder->new, $spec);
-    $builder = SGML::Simple::BuilderBuilder->new ($spec);
+    $builder = SGML::Simple::BuilderBuilder->new (spec => $spec);
 
 =head1 DESCRIPTION
 
@@ -132,6 +132,9 @@ sub visit_gi_QUERY {
     my ($element) = shift;
     my ($rule) = shift;
     my ($query) = $element->as_string;
+
+    # matched in Element.pm
+    $query =~ s/[-]/_/g;
     $rule->query ($query);
 }
 
@@ -140,6 +143,13 @@ sub visit_gi_HOLDER {
     my ($element) = shift;
     my ($rule) = shift;
     $rule->holder (1);
+}
+
+sub visit_gi_IGNORE {
+    my ($builder) = shift;
+    my ($element) = shift;
+    my ($rule) = shift;
+    $rule->ignore (1);
 }
 
 sub visit_gi_MAKE {
@@ -176,7 +186,7 @@ sub visit_gi_STUFF {
     $data =~ s/\\n/\n/g;
     $spec->stuff ($data);
 }
-			  
+
 package SGML::Simple::Spec::BuilderSub;
 @SGML::Simple::Spec::BuilderSub::ISA = qw{SGML::Simple::SpecBuilder};
 

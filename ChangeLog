@@ -1,3 +1,29 @@
+Sun Oct 12 10:12:04 1997  Ken MacLeod  <ken@bitsko.slc.ut.us>
+
+	* SData.pm (name): SData->data was returning self
+
+	* AutoHash.pm (AUTOLOAD): added `as_string'
+
+	* entities/simple-spec.dtd: add `ignore'
+
+	* Simple/Spec.pm (fields): add `ignore'
+
+	* Simple/SpecBuilder.pm (visit_gi_IGNORE): added
+
+	* Simple/BuilderBuilder.pm (new): add `ignore'
+
+	* Element.pm (as_string): had `child' but didn't use it
+
+Sat Oct 11 17:05:59 1997  Ken MacLeod  <ken@bitsko.slc.ut.us>
+
+	* Simple/SpecBuilder.pm (visit_gi_QUERY): clean special characters
+
+	* Element.pm (accept_gi): clean special characters
+
+	* Simple/BuilderBuilder.pm
+	(visit_SGML_Simple_Spec_Rule): support `scalar' and `sdata'
+ 	overrides
+
 Fri Oct 10 10:02:41 1997  Ken MacLeod  <ken@bitsko.slc.ut.us>
 
 	* MANIFEST: added my-html.html, my-html.pl

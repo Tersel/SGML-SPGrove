@@ -2,7 +2,7 @@
 # Copyright (C) 1997 Ken MacLeod
 # See the file COPYING for distribution terms.
 #
-# $Id: Element.pm,v 1.5 1997/10/11 00:01:46 ken Exp $
+# $Id: Element.pm,v 1.6 1997/10/12 21:26:56 ken Exp $
 #
 
 # Internally, an SGML::Element is an array containing
@@ -73,7 +73,8 @@ C<visitor.pl> and C<simple-dump.pl> for more information.
 
 C<$element-E<gt>accept_gi($visitor[, ...])> issues a call back to
 S<C<$visitor-E<gt>visit_gi_I<GI>($element[, ...])>> where I<GI> is the
-generic identifier of this element.
+generic identifier of this element.  C<accept_gi> maps strange
+characters in the GI to underscore (`_') [XXX more specific].
 
 C<children_accept> and C<children_accept_gi> call C<accept> and
 C<accept_gi>, respectively, on each object in the element's content.
@@ -166,7 +167,7 @@ sub as_string {
 	    # XXX should use context for a CDATA mapper
 	    push (@string, $child);
 	} else {
-	    push (@string, $self->[0][$ii]->as_string(@_));
+	    push (@string, $child->as_string(@_));
 	}
     }
     return (join ("", @string));
@@ -183,7 +184,11 @@ sub accept_gi {
     my ($self) = shift;
     my ($visitor) = shift;
 
-    my ($alias) = "visit_gi_" . $self->gi;
+    my ($gi) = $self->gi;
+
+    # matched in SpecBuilder.pm
+    $gi =~ s/[-]/_/g;
+    my ($alias) = "visit_gi_" . $gi;
     $visitor->$alias ($self, @_);
 }
 
@@ -197,7 +202,7 @@ sub children_accept {
 	if (!ref ($child)) {
 	    $visitor->visit_scalar ($child, @_);
 	} else {
-	    $self->[0][$ii]->accept ($visitor, @_);
+	    $child->accept ($visitor, @_);
 	}
     }
 }
@@ -212,7 +217,7 @@ sub children_accept_gi {
 	if (!ref ($child)) {
 	    $visitor->visit_scalar ($child, @_);
 	} else {
-	    $self->[0][$ii]->accept_gi ($visitor, @_);
+	    $child->accept_gi ($visitor, @_);
 	}
     }
 }

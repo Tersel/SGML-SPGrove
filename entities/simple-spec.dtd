@@ -3,11 +3,11 @@
     Copyright (C) 1997 Ken MacLeod
     See the file COPYING for distribution terms.
 
-    $Id: simple-spec.dtd,v 1.1 1997/10/11 00:01:57 ken Exp $
+    $Id: simple-spec.dtd,v 1.2 1997/10/12 21:27:03 ken Exp $
 
 -->
 
-<!ENTITY % actions "code|holder|make|port|rules">
+<!ENTITY % actions "code|holder|ignore|make|port|rules">
 <!ELEMENT spec - - (head, rules, stuff?)>
 <!ATTLIST spec
 	version CDATA #FIXED "1.0" -- Version Number.  -->
@@ -20,7 +20,7 @@
 
 <!ELEMENT rule - o (query, (%actions;)*)>
 <!ELEMENT query - - (#PCDATA)>
-<!ELEMENT holder - o EMPTY>
+<!ELEMENT (holder, ignore) - o EMPTY>
 <!ELEMENT port - - (#PCDATA)>
 <!ELEMENT (make, code) - - ((attr|#PCDATA)*)>
 <!ELEMENT attr - - (#PCDATA)>

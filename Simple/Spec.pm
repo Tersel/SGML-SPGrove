@@ -2,7 +2,7 @@
 # Copyright (C) 1997 Ken MacLeod
 # See the file COPYING for distribution terms.
 #
-# $Id: Spec.pm,v 1.1 1997/10/11 00:01:54 ken Exp $
+# $Id: Spec.pm,v 1.2 1997/10/12 21:27:02 ken Exp $
 #
 
 use SGML::AutoHash;
@@ -21,7 +21,7 @@ SGML::Simple::Spec - a simple transformation specification
     $spec_grove = SGML::SPGrove->new ($spec_sysid);
     $spec = SGML::Simple::Spec->new;
     $spec_grove->accept (SGML::Simple::SpecBuilder->new, $spec);
-    $builder = SGML::Simple::BuilderBuilder->new ($spec);
+    $builder = SGML::Simple::BuilderBuilder->new (spec => $spec);
 
 =head1 DESCRIPTION
 
@@ -68,6 +68,12 @@ to.
 
 A flag indicating that this element merely contains other elements.
 No objects are created during the transformation.
+
+    ignore
+
+A flag indicating that this element should be ignored.  No objects are
+created during the transformation and no elements contained in this
+element are processed.
 
     make
 
@@ -137,6 +143,7 @@ my $fields = {
     query => undef,
     code => undef,
     holder => undef,
+    ignore => undef,
     make => undef,
     port => undef,
     rules => undef,

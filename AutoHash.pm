@@ -2,7 +2,7 @@
 # Copyright (C) 1997 Ken MacLeod
 # See the file COPYING for distribution terms.
 #
-# $Id: AutoHash.pm,v 1.1 1997/10/11 00:01:42 ken Exp $
+# $Id: AutoHash.pm,v 1.2 1997/10/12 21:26:55 ken Exp $
 #
 
 use strict;
@@ -88,7 +88,7 @@ Ken MacLeod, ken@bitsko.slc.ut.us
 sub new {
     my ($type) = shift;
 
-    my ($self) = {};
+    my ($self) = {@_};
     bless ($self, $type);
 
     return ($self);
@@ -127,15 +127,35 @@ EOFEOF
     my $sub_name;
     if ($name eq 'accept') {
 	$sub_name = $name;
-	my $class_under;
-	($class_under = $class) =~ s/::/_/g;
 	$sub .= <<'EOFEOF';
 sub accept {
-  my $self = shift; my $visitor = shift;
-  $visitor->visit_!class! ($self, @_);
+    my $self = shift; my $visitor = shift;
+    my $visit_class = ref($self);
+    $visit_class =~ s/::/_/g;
+    $visit_class = "visit_$visit_class";
+    $visitor->$visit_class ($self, @_);
 }
 EOFEOF
-        $sub =~ s/!class!/$class_under/g;
+    } elsif ($name eq 'as_string') {
+	$sub_name = $name;
+	$sub .= <<'EOFEOF';
+sub as_string {
+    my $self = shift; my $visitor = shift;
+    my (@string);
+    my ($ii);
+    my $contents = $self->{'contents'};
+    for ($ii = 0; $ii <= $#{$contents}; $ii ++) {
+	my ($child) = $contents->[$ii];
+	if (!ref ($child)) {
+	    # XXX should use context for a CDATA mapper
+	    push (@string, $child);
+	} else {
+	    push (@string, $child->as_string(@_));
+	}
+    }
+    return (join ("", @string));
+}
+EOFEOF
     } else {
 	if ($name eq 'children_accept') {
 	    # default field for children_accept
