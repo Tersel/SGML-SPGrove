@@ -4,19 +4,15 @@
 Otherwise,
 
  * bugs
-  ** Perl comments in Specs don't work because REs are CRs
-  ** Simple::Spec: handle element names with special characters
+  ** SPGroveNew: dies ungracefully upon encountering a >255 Unicode character
+  ** SPGroveNew: doesn't disable printing of error messages
 
  * functionality
   ** SPGroveNew: complete ESIS
-  ** AutoHash: borrow more from Class::Template (build more Perlish objects)
   ** Simple::Spec: better support for scalar, array, and hash elements
   ** exception handling
   ** record ends are carriage returns
-
- * performance
-  ** SPGroveNew: build arrays locally
-  ** AutoHash: re-implement `visit_PACKAGE'
+  ** SPGrove: use Class::Visitor
 
  * SP
   ** no events for undefined entities in XML

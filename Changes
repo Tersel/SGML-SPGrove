@@ -1,6 +1,13 @@
 Revision history for Perl extension SGML::SPGrove.
 
-0.07
+0.08  Sun Oct 19 16:22:45 CDT 1997
+	- SPGrove now concatenates consecutive data, *much* faster
+	- remove AutoHash, move to use Class::Visitor
+	- fixes
+	  - accept_gi converts non-perl characters to `_' in visit_gi_GI
+	  - SpecBuilder converts REs to newlines (fixes bug with comments)
+
+0.07  Sun Oct 12 16:28:00 CDT 1997
 	- AutoHash::new now creates $self from arguments
 	- added `as_string' to AutoHash
 	- added `ignore' element to simple specs

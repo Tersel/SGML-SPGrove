@@ -2,10 +2,8 @@
 # Copyright (C) 1997 Ken MacLeod
 # See the file COPYING for distribution terms.
 #
-# $Id: Spec.pm,v 1.2 1997/10/12 21:27:02 ken Exp $
+# $Id: Spec.pm,v 1.3 1997/10/19 21:56:09 ken Exp $
 #
-
-use SGML::AutoHash;
 
 =head1 NAME
 
@@ -30,7 +28,8 @@ objects is built by the C<SpecBuilder> module from a grove of a simple
 specification file.
 
 C<SGML::Simple::Spec> and C<SGML::Simple::Spec::Rule> inherit all
-methods from C<SGML::AutoHash>.  Fields are defined below
+methods from C<Class::Visitor> and C<Class::Template>.  Fields are
+defined below.
 
 C<Spec> objects are passed to C<SGML::Simple::BuilderBuilder> to build
 a Perl package for transforming other SGML groves.
@@ -120,35 +119,28 @@ Ken MacLeod, ken@bitsko.slc.ut.us
 =head1 SEE ALSO
 
   perl(1), SGML::SPGrove(3), SGML::Simple::SpecBuilder(3),
-  SGML::Simple::BuilderBuilder(3), SGML::AutoHash(3)
+  SGML::Simple::BuilderBuilder(3), Class::Visitor(3),
+  Class::Template(3)
 
 =cut
 
-package SGML::Simple::Spec;
-@SGML::Simple::Spec::ISA = qw{SGML::AutoHash};
+use Class::Visitor;
 
-my $fields = {
-    default_object => undef,
-    default_prefix => undef,
-    rules => undef,
-    stuff => undef,
+visitor_class 'SGML::Simple::Spec', 'Class::Visitor::Base', {
+    default_object => '$',
+    default_prefix => '$',
+    rules => '@',
+    stuff => '$',
 };
 
-sub fields { return $fields }
-
-package SGML::Simple::Spec::Rule;
-@SGML::Simple::Spec::Rule::ISA = qw{SGML::AutoHash};
-
-my $fields = {
-    query => undef,
-    code => undef,
-    holder => undef,
-    ignore => undef,
-    make => undef,
-    port => undef,
-    rules => undef,
+visitor_class 'SGML::Simple::Spec::Rule', 'Class::Visitor::Base', {
+    query => '$',
+    code => '$',
+    holder => '$',
+    ignore => '$',
+    make => '$',
+    port => '$',
+    rules => '@',
 };
-
-sub fields { return $fields }
 
 1;

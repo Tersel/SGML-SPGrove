@@ -24,7 +24,7 @@ require DynaLoader;
 
 @ISA = qw(Exporter DynaLoader);
 
-$VERSION = '0.07';
+$VERSION = '0.08';
 
 bootstrap SGML::SPGrove $VERSION;
 

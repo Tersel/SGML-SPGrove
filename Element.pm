@@ -2,7 +2,7 @@
 # Copyright (C) 1997 Ken MacLeod
 # See the file COPYING for distribution terms.
 #
-# $Id: Element.pm,v 1.6 1997/10/12 21:26:56 ken Exp $
+# $Id: Element.pm,v 1.7 1997/10/19 21:56:03 ken Exp $
 #
 
 # Internally, an SGML::Element is an array containing
@@ -186,8 +186,9 @@ sub accept_gi {
 
     my ($gi) = $self->gi;
 
-    # matched in SpecBuilder.pm
-    $gi =~ s/[-]/_/g;
+    # convert all non-word characters to `_' (matched in
+    # SpecBuilder.pm)
+    $gi =~ s/\W/_/g;
     my ($alias) = "visit_gi_" . $gi;
     $visitor->$alias ($self, @_);
 }

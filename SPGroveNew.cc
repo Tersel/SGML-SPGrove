@@ -2,7 +2,7 @@
 // Copyright (C) 1997 Ken MacLeod
 // See the file COPYING for distribution terms.
 //
-// $Id: SPGroveNew.cc,v 1.3 1997/10/09 01:55:14 ken Exp $
+// $Id: SPGroveNew.cc,v 1.4 1997/10/19 21:56:04 ken Exp $
 //
 
 // The next two lines are only to ensure bool gets defined appropriately.
@@ -23,34 +23,11 @@ extern "C" {
 SV *sp_grove_new (char *type, char *);
 }
 
+typedef unsigned char spgrove_char;
+#define GROW_SIZE (1000)
+
 #undef assert
 #include <assert.h>
-
-char *
-as_string (SGMLApplication::CharString text) {
-  static unsigned char buffer[1024+1];
-  size_t str_len = text.len;
-  unsigned char *cptr = &buffer[0];
-  const SGMLApplication::Char *uptr = text.ptr;
-
-  if (str_len > 1024) {
-    // XXX we need to do better than this
-    fprintf (stderr, "string greater than 1024\n");
-    exit (1);
-  }
-
-  while (str_len--) {
-    if ((*uptr & 0xff00) != 0) {
-      // XXX we need to do better than this
-      fprintf (stderr, "character more than 8bits\n");
-      exit (1);
-    }
-    *cptr++ = (unsigned char) *uptr++;
-  }
-  *cptr = '\0';
-
-  return ((char *)&buffer[0]);
-}
 
 class SPGrove : public SGMLApplication {
 public:
@@ -71,6 +48,17 @@ private:
   HV *sdata_stash_;		// SData stash for blessing
   HV *element_stash_;		// Element stash for blessing
   HV *pi_stash_;		// PI stash for blessing
+  spgrove_char *ptr_;		// temporary 8bit string copy area
+  size_t length_;		// points to '\0'
+  size_t alloc_;		// must be at least length_ + 1
+  char *as_string (SGMLApplication::CharString);
+  void append (SGMLApplication::CharString);
+  void flushData() {		// create scalar from accumulated data
+    if (length_ > 0) {
+      av_push(contents_, newSVpv((char *)ptr_, length_));
+      length_ = 0;
+    }
+  };
 };
 
 //
@@ -106,10 +94,15 @@ SPGrove::SPGrove(char *type, SV **grove_ref) {
   element_stash_ = gv_stashpv("SGML::Element", 1);
   pi_stash_ = gv_stashpv("SGML::PI", 1);
   stack_ = newAV();
+
+  ptr_ = new spgrove_char[GROW_SIZE];
+  length_ = 0;
+  alloc_ = GROW_SIZE;
 }
 
 SPGrove::~SPGrove() {
   av_undef(stack_);
+  delete [] ptr_;
 }
 
 //
@@ -118,6 +111,7 @@ SPGrove::~SPGrove() {
 // element's name, and any attributes.  See `SGML::Element'.
 //
 void SPGrove::startElement(const StartElementEvent &event) {
+  flushData();
   SV *element[3];
 
   // Create empty array for contents
@@ -206,21 +200,16 @@ void SPGrove::startElement(const StartElementEvent &event) {
 // copies it's contents to the `contents_' cache
 //
 void SPGrove::endElement(const EndElementEvent &) {
+  flushData();
   contents_ = (AV*)av_pop(stack_);
 }
 
 //
 // `data' is called when ordinary instance data comes across
 //
-// XXX `data' can be optimized
-// SP is a bit overzealous with it's parsing of data, it breaks at
-// every whitespace and creates a new data event.  We can optimize by
-// concatenating the data events into one object.  But to do this, we
-// don't know when ``the last data event'' is, so we have to modify
-// all the event handlers to clean up before their turn.  See `nsgmls'
-// because it does this also.
+// XXX we could provide an option for concatenation
 void SPGrove::data(const DataEvent &event) {
-  av_push(contents_, newSVpv(as_string(event.data), event.data.len));
+  append (event.data);
 }
 
 //
@@ -228,6 +217,7 @@ void SPGrove::data(const DataEvent &event) {
 // sdata is blessed into the SGML::SData class
 //
 void SPGrove::sdata(const SdataEvent &event) {
+  flushData();
   SV *sdata_a[2];
   sdata_a[0] = newSVpv(as_string(event.text), event.text.len);
   sdata_a[1] = newSVpv(as_string(event.entityName), event.entityName.len);
@@ -243,6 +233,7 @@ void SPGrove::sdata(const SdataEvent &event) {
 // processing instructions are blessed into SGML::PI
 //
 void SPGrove::pi(const PiEvent &event) {
+  flushData();
   SV *pi = newSVpv(as_string(event.data), event.data.len);
   SV *pi_ref = newRV(pi);
 
@@ -251,9 +242,72 @@ void SPGrove::pi(const PiEvent &event) {
 }
 
 //
-// `error' is called when an error is encountered during the pars.
+// `error' is called when an error is encountered during the parse.
 //
 void SPGrove::error(const ErrorEvent &event) {
   av_push(errors_, newSVpv(as_string(event.message), event.message.len));
 }
 
+
+//
+// `as_string' uses the temporary string area to convert a CharString
+// to a 8bit string
+//
+// this clears (zero lengths) the temporary string buffer
+//
+char *
+SPGrove::as_string (SGMLApplication::CharString text)
+{
+  size_t str_len = text.len + 1;
+  spgrove_char *cptr = ptr_;
+  const SGMLApplication::Char *uptr = text.ptr;
+
+  if (alloc_ < str_len) {
+    delete [] ptr_;
+    ptr_ = new spgrove_char[str_len];
+    alloc_ = str_len;
+  }
+
+  while (--str_len) {
+    if ((*uptr & 0xff00) != 0) {
+      // XXX we need to do better than this
+      fprintf (stderr, "character more than 8bits\n");
+      exit (1);
+    }
+    *cptr++ = (spgrove_char) *uptr++;
+  }
+  *cptr = '\0';
+
+  length_ = 0;
+
+  return ((char *)ptr_);
+}
+
+void
+SPGrove::append (SGMLApplication::CharString text)
+{
+  size_t str_len = text.len + 1;
+  size_t new_len = length_ + text.len;
+  spgrove_char *cptr = &ptr_[length_];
+  const SGMLApplication::Char *uptr = text.ptr;
+
+  if (alloc_ < new_len + 1) {
+    spgrove_char *s = new spgrove_char[new_len + GROW_SIZE];
+    memcpy (s, ptr_, length_);
+    delete [] ptr_;
+    ptr_ = s;
+    alloc_ = new_len + GROW_SIZE;
+  }
+
+  length_ = new_len;
+
+  while (--str_len) {
+    if ((*uptr & 0xff00) != 0) {
+      // XXX we need to do better than this
+      fprintf (stderr, "character more than 8bits\n");
+      exit (1);
+    }
+    *cptr++ = (spgrove_char) *uptr++;
+  }
+  *cptr = '\0';
+}

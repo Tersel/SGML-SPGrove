@@ -2,7 +2,7 @@
 # Copyright (C) 1997 Ken MacLeod
 # See the file COPYING for distribution terms.
 #
-# $Id: BuilderBuilder.pm,v 1.2 1997/10/12 21:27:01 ken Exp $
+# $Id: BuilderBuilder.pm,v 1.3 1997/10/19 21:56:09 ken Exp $
 #
 
 package SGML::Simple::BuilderBuilder;
@@ -23,7 +23,7 @@ SGML::Simple::BuilderBuilder - build a simple transformation package
     $spec_grove = SGML::SPGrove->new ($spec_sysid);
     $spec = SGML::Simple::Spec->new;
     $spec_grove->accept (SGML::Simple::SpecBuilder->new, $spec);
-    $builder = SGML::Simple::BuilderBuilder->new (spec => $spec[, no_gi => 1]);
+    $builder = SGML::Simple::BuilderBuilder->new (spec => $spec, no_gi => 1);
 
     $grove = SGML::SPGrove->new ($sysid);
     $object_tree_root = My::Object->new();
@@ -91,7 +91,8 @@ sub visit_SGML_Simple_Spec_Rule {
     my $package = shift;
 
     my $sub_builder = "";
-    if (defined $rule->{rules}) {
+    my $rules = $rule->rules;
+    if (defined $rules) {
 	# XXX support sharing of sub-rules
 	my $sub_package = $next_package++;
 
@@ -126,29 +127,32 @@ EOFEOF
 
     my $sub = "";
 
-    if ($rule->{holder}) {
+    my $code;
+    if ($rule->holder) {
 	$sub = <<EOFEOF;
   my \$self = shift; my \$element = shift;
   $sub_builder
   \$element->children_accept_gi (\$self, \@_);
 EOFEOF
-    } elsif ($rule->{code}) {
-	$sub = $rule->{code};
-    } elsif ($rule->{ignore}) {
+    } elsif ($code = $rule->code) {
+	$sub = $code;
+    } elsif ($rule->ignore) {
 	$sub = "";
     } else {
         my $make = "my \$obj = new $self->{'default_object'};";
-        if (defined $rule->{make}) {
+        my $make_val = $rule->make;
+        if (defined $make_val) {
 	    # use a little perl trick here, "new THING ()" is the
 	    # same as "THING->new ()" and `$rule->{make}' already
 	    # has parens
 	    # XXX check to see if class has been loaded
-	    $make = "my \$obj = new $self->{'default_prefix'}::$rule->{make};";
+	    $make = "my \$obj = new $self->{'default_prefix'}::$make_val;";
 	}
 
 	my $push = "\$parent->push (\$obj);";
-	if (defined $rule->{port}) {
-	    $push = "\$parent->push_$rule->{port}(\$obj);";
+        my $port = $rule->port;
+	if (defined $port) {
+	    $push = "\$parent->push_$port (\$obj);";
 	}
 
 	$sub = <<EOFEOF;
@@ -161,7 +165,7 @@ EOFEOF
     }
 
     # create the rule subroutine
-    my @gis = split (/\s+/, $rule->{query});
+    my @gis = split (/\s+/, $rule->query);
     my $gi;
     foreach $gi (@gis) {
         my $sub_name = "visit_gi_$gi";

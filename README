@@ -1,4 +1,4 @@
-$Id: README,v 1.6 1997/10/11 00:01:48 ken Exp $
+$Id: README,v 1.7 1997/10/19 21:56:04 ken Exp $
 
 
                             SGML::SPGrove
@@ -74,11 +74,17 @@ OVERVIEW
 
 INSTALLATION
 
-    SGML::SPGrove requires Perl 5 and James Clark's SP (from the Jade
-    distribution).  SP requires a C++ compiler.
+    SGML::SPGrove requires Perl 5, James Clark's SP (from the Jade
+    distribution), and the Perl modules Class-Eroot and
+    Class-Visitor.  SP requires a C++ compiler.
 
-<http://www.perl.com>
-<http://www.jclark.com>
+<http://www.perl.com/>
+<http://www.jclark.com/>
+<http://www.perl.com/CPAN/modules/by-module/Class/>
+
+    The extra Perl modules are also available at SPGrove's source site.
+
+<ftp://ftp.uu.net/vendor/bitsko/gdo/>
 
     1)  SPGrove needs SP's `libsp.a' and include files.  SP's `make
         install' does not install these [I'm working on that, I should

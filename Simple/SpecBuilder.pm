@@ -2,7 +2,7 @@
 # Copyright (C) 1997 Ken MacLeod
 # See the file COPYING for distribution terms.
 #
-# $Id: SpecBuilder.pm,v 1.2 1997/10/12 21:27:02 ken Exp $
+# $Id: SpecBuilder.pm,v 1.3 1997/10/19 21:56:10 ken Exp $
 #
 
 package SGML::Simple::SpecBuilder;
@@ -133,8 +133,9 @@ sub visit_gi_QUERY {
     my ($rule) = shift;
     my ($query) = $element->as_string;
 
-    # matched in Element.pm
-    $query =~ s/[-]/_/g;
+    # convert all non-word, non-space characters to `_' (matched in
+    # Element.pm)
+    $query =~ s/[^\w\s]/_/g;
     $rule->query ($query);
 }
 
@@ -183,7 +184,7 @@ sub visit_gi_ATTR {
 sub visit_gi_STUFF {
     my ($builder, $element, $spec) = @_;
     my ($data) = $element->as_string;
-    $data =~ s/\\n/\n/g;
+    $data =~ tr/\r/\n/;
     $spec->stuff ($data);
 }
 
@@ -199,6 +200,7 @@ sub visit_scalar {
     my ($scalar) = shift;
     my ($make_str) = shift;
     $scalar =~ s/(\w+):(?!:)/$1 =>/;
+    $scalar =~ tr/\r/\n/;
     push (@{$make_str}, $scalar);
 }
 

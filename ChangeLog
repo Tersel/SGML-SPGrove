@@ -1,3 +1,26 @@
+Sun Oct 19 11:01:28 1997  Ken MacLeod  <ken@bitsko.slc.ut.us>
+
+	* Simple/SpecBuilder.pm (visit_gi_STUFF, visit_scalar): convert RE
+ 	to newline
+
+	* Element.pm (accept_gi): convert all non-word characters to `_'
+
+	* Simple/SpecBuilder.pm (visit_gi_QUERY): convert all non-word
+ 	characters to `_'
+
+	* SPGroveNew.cc: concatenate consecutive data events
+
+	* SPGroveNew.cc (flushData, append): added
+
+Sat Oct 18 16:53:48 1997  Ken MacLeod  <ken@bitsko.slc.ut.us>
+
+	* Simple/Spec.pm, Simple/BuilderBuilder.pm: use new Class::Visitor
+ 	style
+
+	* MANIFEST: removed AutoHash.pm
+
+	* AutoHash.pm: removed
+
 Sun Oct 12 10:12:04 1997  Ken MacLeod  <ken@bitsko.slc.ut.us>
 
 	* SData.pm (name): SData->data was returning self
