@@ -1,0 +1,17 @@
+$Id: README,v 1.1 1997/10/07 00:51:01 ken Exp $
+Copyright (C) 1997 Ken MacLeod
+See the file COPYING for distribution terms.
+
+
+			   SPGrove Examples
+
+The following examples are listed in concept order, starting with the
+first will lead into concepts in the later examples.
+
+    visitor.pl
+        A skeleton of the Visitor pattern.  Doesn't actually do
+        anything visible.
+
+    simple-dump.pl
+        Uses the visitor pattern to dump groves on standard output in
+        an indented format.

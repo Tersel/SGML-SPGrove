@@ -1,0 +1,109 @@
+#
+# Copyright (C) 1997 Ken MacLeod
+# See the file COPYING for distribution terms.
+#
+# $Id: SData.pm,v 1.4 1997/10/09 01:55:12 ken Exp $
+#
+
+# Internally, an SGML::SData is an array containing
+#
+#     [0] -- text
+#     [1] -- name
+
+package SGML::SData;
+
+use strict;
+
+=head1 NAME
+
+SGML::SData - an SGML, XML, or HTML document SData replacement
+
+=head1 SYNOPSIS
+
+  $data = $sdata->data;
+  $name = $sdata->name;
+
+  $sdata->as_string([$context, ...]);
+
+  $sdata->accept($visitor, ...);
+  $sdata->accept_gi($visitor, ...);
+  $sdata->children_accept($visitor, ...);
+  $sdata->children_accept_gi($visitor, ...);
+
+=head1 DESCRIPTION
+
+C<SGML::SData> objects are loaded by C<SGML::SPGrove>.  An
+C<SGML::SData> contains the replacement value of a character entity
+reference.
+
+C<$sdata-E<gt>data> returns the data of the SData object.
+
+C<$sdata-E<gt>name> returns the entity name of the SData object.
+
+The Perl module C<Text::EntityMap> can be used to map commonly used
+character entity sets to common output formats.
+
+C<$sdata-E<gt>as_string([$context, ...])> returns C<data> surrounded
+by brackets (`[ ... ]') unless C<$context-E<gt>{sdata_mapper}> is
+defined, in which case it returns the result of calling the
+C<sdata_mapper> subroutine with C<data> and the remaining arguments.
+The actual implementation is:
+
+    &{$context->{sdata_mapper}} ($self->data, @_);
+
+C<$sdata-E<gt>accept($visitor[, ...])> issues a call back to
+S<C<$visitor-E<gt>visit_sdata($sdata[, ...])>>.  See examples
+C<visitor.pl> and C<simple-dump.pl> for more information.
+
+C<$sdata-E<gt>accept_gi($visitor[, ...])> is implemented as a synonym
+for C<accept>.
+
+C<children_accept> and C<children_accept_gi> do nothing.
+
+=head1 AUTHOR
+
+Ken MacLeod, ken@bitsko.slc.ut.us
+
+=head1 SEE ALSO
+
+perl(1), SGML::SPGrove(3), Text::EntityMap(3), SGML::Element(3),
+SGML::PI(3).
+
+=cut
+
+sub data {
+    return $_[0];
+}
+
+sub name {
+    return $_[1];
+}
+
+sub as_string {
+    my ($self) = shift;
+    my ($context) = shift;
+
+    # XXX needs to use `context' to find an SDATA mapper
+    return ("[" . $self->data . "]");
+}
+
+sub accept {
+    my ($self) = shift;
+    my ($visitor) = shift;
+
+    $visitor->visit_sdata ($self, @_);
+}
+
+# synonomous to `accept'
+sub accept_gi {
+    my ($self) = shift;
+    my ($visitor) = shift;
+
+    $visitor->visit_sdata ($self, @_);
+}
+
+# these are here just for type compatibility
+sub children_accept { }
+sub children_accept_gi { }
+
+1;

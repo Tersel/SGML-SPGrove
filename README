@@ -1,0 +1,85 @@
+$Id: README,v 1.5 1997/10/09 01:55:11 ken Exp $
+
+
+                            SGML::SPGrove
+
+                   A Perl 5 module for loading SGML,
+                   XML, and HTML document instances
+                       using James Clark's SP.
+
+
+                             Ken MacLeod
+                         ken@bitsko.slc.ut.us
+
+INTRODUCTION
+
+    The SGML::SPGrove module links with James Clark's SGML Parser (SP)
+    to load SGML, XML, and HTML document instances.
+
+    See the file Changes for user-visible changes.
+
+    Newer versions of this module can be found at
+    <ftp://ftp.uu.net/vendor/bitsko/gdo/>.
+
+    Copyright (C) 1997 Ken MacLeod
+    SPGrove is distributed under the same terms as SP.  See the file
+    COPYING for distribution terms.
+
+OVERVIEW
+
+    SGML::SPGrove takes a system identifier and passes it to SP to
+    parse, as each element is parsed from the document SPGrove builds
+    Perl objects to match.  When done parsing, SPGrove returns an
+    SGML::SPGrove object that contains the root element of the parsed
+    document and an array (hopefully empty :-) of parser errors.
+
+    Elements of the document are SGML::Element objects.  Elements
+    have a generic identifier (or name), attributes, and the contents
+    of the element.  Attributes are stored as a Perl hash, with the
+    values as an array of scalars and SGML::SData objects.  The
+    contents of an element may be more Elements, scalars, SData
+    objects, or processing instruction (PI) objects.
+
+    SGML::SData objects are replacements for character entity
+    references within the document.  The Text::EntityMap perl module
+    can be used to map SData replacements from common character entity
+    sets to common output formats.
+
+<ftp://ftp.uu.net/vendor/bitsko/entity-map/>
+
+    SGML::PI objects are processing instructions contained within the
+    document.
+
+    See the pod/man pages for SGML::SPGrove, SGML::Element,
+    SGML::SData, SGML::PI for more info.
+
+INSTALLATION
+
+    SGML::SPGrove requires Perl 5 and James Clark's SP (from the Jade
+    distribution).  SP requires a C++ compiler.
+
+<http://www.perl.com>
+<http://www.jclark.com>
+
+    1)  SPGrove needs SP's `libsp.a' and include files.  SP's `make
+        install' does not install these [I'm working on that, I should
+        have an RPM available soon].  Create a workarea for compiling
+        SP, compile it and keep the workarea until SPGrove is done.
+
+        Edit SPGrove's Makefile.PL to point `LIBS' to SP's `lib'
+        directory and `INC' to SP's three include directories.  I've
+        left my templates in to point the way.
+
+    2)  standard Perl module after that,
+
+            perl Makefile.PL
+            make
+            make test
+            make install
+
+        Just so you know, SPGrove's copy of SP's library is included
+        in the install, that's over a megabyte and a half.
+
+        FYI, a statically linked perl executable (`make perl') appears
+        to run significantly faster, in one test, 17 seconds instead
+        of 25 seconds.

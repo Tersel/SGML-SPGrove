@@ -1,0 +1,55 @@
+Wed Oct  8 16:54:18 1997  Ken MacLeod  <ken@bitsko.slc.ut.us>
+
+	* README: `make test', not `make check'
+
+Tue Oct  7 14:54:37 1997  Ken MacLeod  <ken@bitsko.slc.ut.us>
+
+	* SData.pm, SPGroveNew.cc: added name field to SData
+
+	* SPGrove.pm, Element.pm, SData.pm, PI.pm:
+	added docs and impl for as_string, accept, accept_gi,
+	children_accept, children_accept_gi
+
+Mon Oct  6 16:19:19 1997  Ken MacLeod  <ken@bitsko.slc.ut.us>
+
+	* MANIFEST: added examples/README, simple-dump.pl, visitor.pl
+
+	* SPGrove.pm, Element.pm, SData.pm, PI.pm (as_string): added
+
+	* examples/simple-dump.pl: created
+
+	* examples/visitor.pl: created
+
+	* examples/README: created
+
+	* SData.pm, PI.pm (data): dereference the return value
+
+	* SPGrove.pm: `use' SGML::Element, SGML::SData, and SGML::PI
+
+	* test.pl: add contents order test
+
+	* SPGroveNew.cc(startElement, endElement):
+	fix pushing order of contents
+	push contents instead of element_ref
+	
+
+Sun Oct  5 15:07:27 1997  Ken MacLeod  <ken@bitsko.slc.ut.us>
+
+	* MANIFEST(GroveIter.pm): removed
+
+	* Element.pm, SData.pm, PI.pm: add module `1;'
+
+	* GroveIter.pm: added
+
+	* Element.pm (contents): corrected function name
+
+	* SGML-SPGrove.spec (%files): fixed perl dir
+
+	* Makefile.PL(dist): added to use gzip
+
+	* README: updated to 0.02
+
+	* SPGrove.pm: dummied version to 0.00 for `make-rel'
+
+	* MANIFEST(COPYING, SGML-SPGrove.spec, ChangeLog): added
+

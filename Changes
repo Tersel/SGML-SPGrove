@@ -1,0 +1,26 @@
+Revision history for Perl extension SGML::SPGrove.
+
+0.05  Wed Oct  8 20:50:36 CDT 1997
+	- support for entity name in SData
+	- added accept, accept_gi, children_accept, and
+	  children_accept_gi functions
+	- fixed release to actually include the examples :-)
+
+0.04  Mon Oct  6 19:50:05 CDT 1997
+	- fixed sdata->data dereferencing
+	- added examples/visitor.pl
+	- added examples/simple-dump.pl
+	- added `as_string' functions
+
+0.03  Mon Oct  6 16:24:25 CDT 1997
+	- fixed element stacking bug
+	- SPGrove loads the other classes (`use')
+
+0.02  Sun Oct  5 23:02:36 CDT 1997
+	- added `accept' visitor functions
+	- fixed missing `1;' in perl modules
+	- fixed missing `contents' sub in SPGrove
+
+0.01  Fri Oct  3 17:49:29 1997
+	- original version; created by h2xs 1.16
+
