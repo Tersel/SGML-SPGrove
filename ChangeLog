@@ -1,3 +1,19 @@
+Fri Oct 10 10:02:41 1997  Ken MacLeod  <ken@bitsko.slc.ut.us>
+
+	* MANIFEST: added my-html.html, my-html.pl
+
+	* examples/README: added info on `my-html'
+
+	* my-html.pl, my-html.html: added
+
+	* README: added info on Simple
+
+	* AutoHash.pm: added
+
+	* SpecBuilder.pm, Spec.pm, BuilderBuilder.pm: added
+
+	* Element.pm (attr, attr_as_string): added
+
 Wed Oct  8 16:54:18 1997  Ken MacLeod  <ken@bitsko.slc.ut.us>
 
 	* README: `make test', not `make check'

@@ -2,7 +2,7 @@
 # Copyright (C) 1997 Ken MacLeod
 # See the file COPYING for distribution terms.
 #
-# $Id: Element.pm,v 1.4 1997/10/09 01:55:08 ken Exp $
+# $Id: Element.pm,v 1.5 1997/10/11 00:01:46 ken Exp $
 #
 
 # Internally, an SGML::Element is an array containing
@@ -23,6 +23,8 @@ SGML::Element - an element of an SGML, XML, or HTML document
 
   $element->gi;
   $element->name;
+  $element->attr ($attr[, $value]);
+  $element->attr_as_string ($attr[, $context, ...]);
   $element->attributes;
   $element->contents;
 
@@ -42,6 +44,15 @@ element.
 
 C<$element-E<gt>gi> and C<$element-E<gt>name> are synonyms, they
 return the generic identifier of the element.
+
+C<$element-E<gt>attr> returns the array value of an attribute, if a
+second argument is given then that value is assigned to the attribute
+and returned.  When assigning a value, C<attr> can take an array, or
+an object or scalar.  If given an object or scalar, C<attr> will
+create an array value for it.
+
+C<$element-E<gt>attr_as_string> returns the value of an attribute as a
+string, possibly modified by C<$context>.
 
 C<$element-E<gt>attributes> returns a reference to a hash containing
 the attributes of the element.  The keys of the hash are the attribute
@@ -100,6 +111,43 @@ sub gi {
 
 sub name {
     return $_[0]->[1];
+}
+
+sub attr {
+    my $self = shift;
+    my $attr = shift;
+
+    if (@_) {
+	my $value = shift;
+	if (ref ($value) eq 'ARRAY') {
+	    return $self->[2]->{$attr} = $value;
+	} else {
+	    return $self->[2]->{$attr} = [$value];
+	}	    
+    } else {
+	return $self->[2]->{$attr};
+    }
+}
+
+# $element->attr_as_string($attr[, $context]);
+sub attr_as_string {
+    my $self = shift;
+    my $attr = shift;
+
+    my $value = $self->[2]->{$attr};
+    return "" if !defined $value;
+
+    my ($ii, @string);
+    for ($ii = 0; $ii <= $#{$value}; $ii ++) {
+	my ($child) = $value->[$ii];
+	if (!ref ($child)) {
+	    # XXX should use context for a CDATA mapper
+	    push (@string, $child);
+	} else {
+	    push (@string, $child->as_string(@_));
+	}
+    }
+    return (join ("", @string));
 }
 
 sub attributes {

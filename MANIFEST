@@ -1,3 +1,4 @@
+AutoHash.pm
 ChangeLog
 Changes
 COPYING
@@ -5,14 +6,21 @@ MANIFEST
 README
 Makefile.PL
 SGML-SPGrove.spec
-SGML-SPGrove-0.05.spec
+SGML-SPGrove-0.06.spec
 SPGrove.pm
 SPGrove.xs
 Element.pm
 SData.pm
 PI.pm
 SPGroveNew.cc
+Simple/BuilderBuilder.pm
+Simple/Spec.pm
+Simple/SpecBuilder.pm
+entities/catalog
+entities/simple-spec.dtd
 test.pl
 examples/README
 examples/simple-dump.pl
 examples/visitor.pl
+examples/my-html.html
+examples/my-html.pl

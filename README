@@ -1,4 +1,4 @@
-$Id: README,v 1.5 1997/10/09 01:55:11 ken Exp $
+$Id: README,v 1.6 1997/10/11 00:01:48 ken Exp $
 
 
                             SGML::SPGrove
@@ -14,9 +14,13 @@ $Id: README,v 1.5 1997/10/09 01:55:11 ken Exp $
 INTRODUCTION
 
     The SGML::SPGrove module links with James Clark's SGML Parser (SP)
-    to load SGML, XML, and HTML document instances.
+    to load SGML, XML, and HTML document instances.  SPGrove supports
+    the Visitor design pattern for accessing the grove and also comes
+    with a module for performing simple rule-based transformations to
+    Perl objects.
 
-    See the file Changes for user-visible changes.
+    See the file Changes for user-visible changes.  See the `examples'
+    directory for examples of using `SPGrove'.
 
     Newer versions of this module can be found at
     <ftp://ftp.uu.net/vendor/bitsko/gdo/>.
@@ -50,8 +54,23 @@ OVERVIEW
     SGML::PI objects are processing instructions contained within the
     document.
 
+    SGML::Simple::Spec, SGML::Simple::SpecBuilder, and
+    SGML::Simple::BuilderBuilder work together to implement a simple
+    rule-based transformer for transforming document instances to Perl
+    objects.  SpecBuilder takes a spec grove conforming to the
+    ``SPGrove Simple Spec'' DTD and creates a specification object
+    that can be given to BuilderBuilder to create a Visitor package
+    that can be used to transform other groves to Perl objects.
+
     See the pod/man pages for SGML::SPGrove, SGML::Element,
-    SGML::SData, SGML::PI for more info.
+    SGML::SData, SGML::PI, and SGML::Simple::Spec for more info.
+
+    Visitors and Builders are explained thoroughly in ``Design
+    Patterns: Elements of Reusable Object-Oriented Software'' by
+    Gamma, Helm, Johnson, and Vlissides, published by Addison-Wesley
+    (ISBN 0-201-63361-2).
+
+<http://st-www.cs.uiuc.edu/users/patterns/patterns.html>
 
 INSTALLATION
 

@@ -2,7 +2,7 @@
 # Copyright (C) 1997 Ken MacLeod
 # See the file COPYING for distribution terms.
 #
-# $Id: Makefile.PL,v 1.3 1997/10/05 21:25:52 ken Exp $
+# $Id: Makefile.PL,v 1.4 1997/10/11 00:01:47 ken Exp $
 #
 
 use ExtUtils::MakeMaker;
@@ -22,5 +22,6 @@ WriteMakefile(
 	      . ' -I/home/ken/isrc/sp-1.2/generic'
 	      . ' -I/home/ken/isrc/sp-1.2/include',
     'OBJECT'    => "SPGrove.o SPGroveNew.o",
+    'PMLIBDIRS' => [ 'Simple' ],
     dist        => {'COMPRESS'  => 'gzip', 'SUFFIX'    => '.gz'},
 );

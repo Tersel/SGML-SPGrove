@@ -1,5 +1,11 @@
 Revision history for Perl extension SGML::SPGrove.
 
+0.06  Fri Oct 10 19:01:04 CDT 1997
+	- added `my-html' example
+	- added `AutoHash' virtual superclass
+	- added `Simple' rule-based transformer
+	- added `attr' and `attr_as_string' to Element
+
 0.05  Wed Oct  8 20:50:36 CDT 1997
 	- support for entity name in SData
 	- added accept, accept_gi, children_accept, and
