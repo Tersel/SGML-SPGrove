@@ -1,8 +1,8 @@
 Summary: Perl module for loading SGML, XML, and HTML
 Name: SGML-SPGrove
-Version: 0.08
+Version: 0.10
 Release: 1
-Source: ftp://ftp.uu.net/vendor/bitsko/gdo/SGML-SPGrove-0.08.tar.gz
+Source: ftp://ftp.uu.net/vendor/bitsko/gdo/SGML-SPGrove-0.10.tar.gz
 Copyright: distributable
 Group: Applications/Publishing/SGML
 URL: http://www.bitsko.slc.ut.us/
@@ -10,9 +10,15 @@ Packager: ken@bitsko.slc.ut.us (Ken MacLeod)
 BuildRoot: /tmp/SGML-SPGrove
 
 #
-# $Id: SGML-SPGrove.spec,v 1.3 1997/10/05 21:46:43 ken Exp $
+# $Id: SGML-SPGrove.spec,v 1.4 1997/10/22 22:16:45 ken Exp $
 #
 # $Log: SGML-SPGrove.spec,v $
+# Revision 1.4  1997/10/22 22:16:45  ken
+#         - fixes
+#           - BuilderBuilder: wasn't passing extra arguments
+#           - BuilderBuilder: only carp once about unhandled GIs
+#           - RPM spec missing Simple/
+#
 # Revision 1.3  1997/10/05 21:46:43  ken
 # SGML-SPGrove.spec: fixed perl paths again
 #
@@ -58,7 +64,13 @@ make PREFIX="${RPM_ROOT_DIR}/usr" pure_install
 /usr/lib/perl5/SGML/SPGrove.pm
 /usr/lib/perl5/SGML/PI.pm
 /usr/lib/perl5/SGML/Element.pm
+/usr/lib/perl5/SGML/Simple/BuilderBuilder.pm
+/usr/lib/perl5/SGML/Simple/SpecBuilder.pm
+/usr/lib/perl5/SGML/Simple/Spec.pm
 /usr/lib/perl5/man/man3/SGML::SData.3
 /usr/lib/perl5/man/man3/SGML::SPGrove.3
 /usr/lib/perl5/man/man3/SGML::PI.3
 /usr/lib/perl5/man/man3/SGML::Element.3
+/usr/lib/perl5/man/man3/SGML::Simple::BuilderBuilder.3
+/usr/lib/perl5/man/man3/SGML::Simple::SpecBuilder.3
+/usr/lib/perl5/man/man3/SGML::Simple::Spec.3

@@ -2,7 +2,7 @@
 // Copyright (C) 1997 Ken MacLeod
 // See the file COPYING for distribution terms.
 //
-// $Id: SPGroveNew.cc,v 1.4 1997/10/19 21:56:04 ken Exp $
+// $Id: SPGroveNew.cc,v 1.5 1997/10/25 00:03:56 ken Exp $
 //
 
 // The next two lines are only to ensure bool gets defined appropriately.
@@ -259,7 +259,6 @@ char *
 SPGrove::as_string (SGMLApplication::CharString text)
 {
   size_t str_len = text.len + 1;
-  spgrove_char *cptr = ptr_;
   const SGMLApplication::Char *uptr = text.ptr;
 
   if (alloc_ < str_len) {
@@ -267,6 +266,8 @@ SPGrove::as_string (SGMLApplication::CharString text)
     ptr_ = new spgrove_char[str_len];
     alloc_ = str_len;
   }
+
+  spgrove_char *cptr = ptr_;
 
   while (--str_len) {
     if ((*uptr & 0xff00) != 0) {
@@ -288,7 +289,6 @@ SPGrove::append (SGMLApplication::CharString text)
 {
   size_t str_len = text.len + 1;
   size_t new_len = length_ + text.len;
-  spgrove_char *cptr = &ptr_[length_];
   const SGMLApplication::Char *uptr = text.ptr;
 
   if (alloc_ < new_len + 1) {
@@ -299,6 +299,7 @@ SPGrove::append (SGMLApplication::CharString text)
     alloc_ = new_len + GROW_SIZE;
   }
 
+  spgrove_char *cptr = &ptr_[length_];
   length_ = new_len;
 
   while (--str_len) {

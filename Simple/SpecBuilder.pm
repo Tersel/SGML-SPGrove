@@ -2,7 +2,7 @@
 # Copyright (C) 1997 Ken MacLeod
 # See the file COPYING for distribution terms.
 #
-# $Id: SpecBuilder.pm,v 1.3 1997/10/19 21:56:10 ken Exp $
+# $Id: SpecBuilder.pm,v 1.4 1997/10/25 00:04:01 ken Exp $
 #
 
 package SGML::Simple::SpecBuilder;
@@ -199,7 +199,7 @@ sub visit_scalar {
     my ($builder) = shift;
     my ($scalar) = shift;
     my ($make_str) = shift;
-    $scalar =~ s/(\w+):(?!:)/$1 =>/;
+    $scalar =~ s/(\w+):(?!:)/$1 =>/g;
     $scalar =~ tr/\r/\n/;
     push (@{$make_str}, $scalar);
 }

@@ -1,4 +1,21 @@
+Fri Oct 24 10:09:19 1997  Ken MacLeod  <ken@bitsko.slc.ut.us>
+
+	* Simple/BuilderBuilder.pm (new): implement `no_gi'
+
+	* Simple/SpecBuilder.pm (visit_scalar): fix not doing global
+ 	replace on argument translation
+
+	* SPGroveNew.cc: fixed pointer reassignment core dump
+
+Mon Oct 20 10:16:23 1997  Ken MacLeod  <ken@bitsko.slc.ut.us>
+
+	* Simple/BuilderBuilder.pm (AUTOLOAD): only carp once about
+ 	missing GI
+	(new): created code wasn't passing extra arguments
+
 Sun Oct 19 11:01:28 1997  Ken MacLeod  <ken@bitsko.slc.ut.us>
+
+	* SGML-SPGrove.spec (%files): added Simple/
 
 	* Simple/SpecBuilder.pm (visit_gi_STUFF, visit_scalar): convert RE
  	to newline

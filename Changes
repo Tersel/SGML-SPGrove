@@ -1,5 +1,17 @@
 Revision history for Perl extension SGML::SPGrove.
 
+0.10  Fri Oct 24 19:02:18 CDT 1997
+	- Simple/BuilderBuilder: implement `no_gi'
+	- fixes
+	  - SPGroveNew: core dump on long stretches of data
+	  - SpecBuilder: not doing global replace on argument translation
+
+0.09  Wed Oct 22 17:15:34 CDT 1997
+	- fixes
+	  - BuilderBuilder: wasn't passing extra arguments
+	  - BuilderBuilder: only carp once about unhandled GIs
+	  - RPM spec missing Simple/
+
 0.08  Sun Oct 19 16:22:45 CDT 1997
 	- SPGrove now concatenates consecutive data, *much* faster
 	- remove AutoHash, move to use Class::Visitor

@@ -2,7 +2,7 @@
 # Copyright (C) 1997 Ken MacLeod
 # See the file COPYING for distribution terms.
 #
-# $Id: BuilderBuilder.pm,v 1.3 1997/10/19 21:56:09 ken Exp $
+# $Id: BuilderBuilder.pm,v 1.5 1997/10/25 00:04:01 ken Exp $
 #
 
 package SGML::Simple::BuilderBuilder;
@@ -23,7 +23,7 @@ SGML::Simple::BuilderBuilder - build a simple transformation package
     $spec_grove = SGML::SPGrove->new ($spec_sysid);
     $spec = SGML::Simple::Spec->new;
     $spec_grove->accept (SGML::Simple::SpecBuilder->new, $spec);
-    $builder = SGML::Simple::BuilderBuilder->new (spec => $spec, no_gi => 1);
+    $builder = SGML::Simple::BuilderBuilder->new (spec => $spec[, no_gi => 1]);
 
     $grove = SGML::SPGrove->new ($sysid);
     $object_tree_root = My::Object->new();
@@ -67,7 +67,7 @@ sub new {
     bless ($self, $type);
 
     my $package = $next_package++;
-    new_package ($package, 'NoSuchGI_');
+    new_package ($package, 'NoSuchGI_', $self->{'no_gi'});
 
     $self->{'default_object'} = $self->{spec}->default_object;
     $self->{'default_prefix'} = $self->{spec}->default_prefix;
@@ -83,6 +83,14 @@ sub visit_SGML_Simple_Spec {
     my $package = shift;
 
     $spec->children_accept_rules ($self, $package, @_);
+
+    my $stuff = $spec->stuff;
+    if (defined $stuff) {
+	eval "package $package;\n$stuff\n";
+        die "BuilderBuilder::visit_SGML_Simple_Spec: unable to compile stuff\n"
+          . "$@\n"
+            if $@;
+    }
 }
 
 sub visit_SGML_Simple_Spec_Rule {
@@ -129,10 +137,11 @@ EOFEOF
 
     my $code;
     if ($rule->holder) {
+        my $gi = $self->{'no_gi'} ? "" : "_gi";
 	$sub = <<EOFEOF;
   my \$self = shift; my \$element = shift;
   $sub_builder
-  \$element->children_accept_gi (\$self, \@_);
+  \$element->children_accept$gi (\$self, \@_);
 EOFEOF
     } elsif ($code = $rule->code) {
 	$sub = $code;
@@ -155,12 +164,13 @@ EOFEOF
 	    $push = "\$parent->push_$port (\$obj);";
 	}
 
+        my $gi = $self->{'no_gi'} ? "" : "_gi";
 	$sub = <<EOFEOF;
   my \$self = shift; my \$element = shift; my \$parent = shift;
   $make
   $push
   $sub_builder
-  \$element->children_accept_gi (\$self, \$obj);
+  \$element->children_accept$gi (\$self, \$obj, \@_);
 EOFEOF
     }
 
@@ -168,7 +178,6 @@ EOFEOF
     my @gis = split (/\s+/, $rule->query);
     my $gi;
     foreach $gi (@gis) {
-        my $sub_name = "visit_gi_$gi";
         $sub_name = "visit_$gi"
             if ($gi eq 'scalar' || $gi eq 'sdata' || $self->{no_gi});
         my $retval = eval <<EOFEOF;
@@ -188,6 +197,7 @@ EOFEOF
 sub new_package {
     my $new_package = shift;
     my $super_package = shift;
+    my $no_gi = shift;
 
     my $str = <<'EOFEOF';
 package !new_package!;
@@ -212,13 +222,15 @@ sub visit_grove {
     my $self = shift; my $grove = shift;
 
     # XXX capture grove information to built object?
-    $grove->children_accept_gi ($self, @_);
+    $grove->children_accept!gi! ($self, @_);
 }
 
 # XXX PI, entities?
 EOFEOF
     $str =~ s/!new_package!/$new_package/g;
     $str =~ s/!super_package!/$super_package/g;
+    my $gi = $no_gi ? "" : "_gi";
+    $str =~ s/!gi!/$gi/g;
     eval $str;
     die "BuilderBuilder::visit_SGML_Simple_Spec: unable to compile rule\n"
       . "$str\n$@\n"
@@ -245,7 +257,7 @@ sub visit_sdata {
 }
 
 sub AUTOLOAD {
-    my $self = shift; my $visted = shift;
+    my $self = shift; my $visited = shift;
     my $obj = shift; my $context = shift;
 
     my $type = ref($self)
@@ -258,7 +270,10 @@ sub AUTOLOAD {
     return if ($name eq 'DESTROY'); # per perlbot(1)
 
     if ($op eq 'visit_gi_' | $op eq 'visit_') {
-	carp "$name not handled\n";
+	if (!$context->{'not_handled'}{"$op$name"}) {
+	    carp "$name not handled\n";
+	    $context->{'not_handled'}{"$op$name"} = 1;
+	}
     } else {
 	croak "$AUTOLOAD: huh?\n";
     }
